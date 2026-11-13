@@ -234,3 +234,94 @@ export const SECTION_LABEL: Record<string, string> = {
   grafo: "Grafo",
   outros: "Outros",
 };
+
+// ---------------------------------------------------------------- conselho
+
+export interface Professor {
+  id: string;
+  grupo: string;
+  cursos: string;
+  area: string;
+  titulo: string;
+  repos: string[];
+  lente: string;
+  documentos: number;
+}
+
+export interface PerspectiveInfo {
+  professor: string;
+  citations: { valid: number[]; invalid: number[] };
+  general: number;
+  grounded: boolean;
+  model: string | null;
+  latencyMs: number;
+  outputTokens: number | null;
+  error?: string;
+}
+
+export interface CouncilHandlers {
+  onSources: (professor: string, sources: Source[]) => void;
+  onDelta: (professor: string, text: string) => void;
+  onPerspective: (info: PerspectiveInfo) => void;
+  onDone: (info: { latencyMs: number; inputTokens: number; outputTokens: number }) => void;
+  onError: (message: string) => void;
+}
+
+export interface CouncilInfo {
+  padrao: string[];
+  grupos: { id: string; nome: string }[];
+  professores: Professor[];
+}
+
+export async function getCouncil(publicOnly = false): Promise<CouncilInfo | null> {
+  if (isDemo()) return null;
+  try {
+    const info = await json<CouncilInfo>(`api/council${publicOnly ? "?public=1" : ""}`);
+    // Servidor anterior à divisão em grupos: agrupa pelo campo de cada professor, na ordem em que aparecem.
+    info.grupos ??= [...new Set(info.professores.map((p) => p.grupo ?? "professores"))].map((id) => ({ id, nome: id }));
+    for (const p of info.professores) p.grupo ??= "professores";
+    return info;
+  } catch {
+    return null;
+  }
+}
+
+/** POST /api/council em SSE: os eventos de professores diferentes chegam intercalados. */
+export async function convene(
+  body: { question: string; professors: string[]; publicOnly?: boolean },
+  h: CouncilHandlers,
+  signal: AbortSignal,
+) {
+  const res = await fetch("api/council", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok || !res.body) {
+    const detail = await res.json().catch(() => null);
+    h.onError(detail?.error ? String(detail.error) : `A API respondeu ${res.status}`);
+    return;
+  }
+  const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+  let buffer = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += value;
+    let sep: number;
+    while ((sep = buffer.indexOf("\n\n")) >= 0) {
+      const raw = buffer.slice(0, sep);
+      buffer = buffer.slice(sep + 2);
+      const event = /^event: (.+)$/m.exec(raw)?.[1];
+      const data = /^data: (.+)$/m.exec(raw)?.[1];
+      if (!event || !data) continue;
+      const p = JSON.parse(data);
+      if (event === "sources") h.onSources(p.professor, p.sources);
+      else if (event === "delta") h.onDelta(p.professor, p.text);
+      else if (event === "perspectiva") h.onPerspective(p);
+      else if (event === "done") h.onDone(p);
+      else if (event === "error") h.onError(p.message);
+    }
+  }
+}

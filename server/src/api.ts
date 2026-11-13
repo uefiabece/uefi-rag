@@ -3,6 +3,7 @@ import path from "node:path";
 import Fastify from "fastify";
 import { z } from "zod";
 import { answer } from "./answer.js";
+import { convene, loadCouncil, professorCoverage, selectProfessors } from "./council.js";
 import { ROOT, settings } from "./config.js";
 import { getDb } from "./db.js";
 import { getGenerator } from "./generate.js";
@@ -141,6 +142,62 @@ app.post("/api/ask", async (req, reply) => {
     if (!abort.signal.aborted) {
       req.log.error(err);
       send("error", { message: err instanceof Error ? err.message : String(err) });
+    }
+  } finally {
+    res.end();
+  }
+});
+
+const CouncilBody = z.object({
+  question: z.string().min(2).max(2000),
+  professors: z.array(z.string()).max(5).optional(),
+  publicOnly: z.boolean().optional(),
+});
+
+app.get("/api/council", async (req) => {
+  const publicOnly = (req.query as { public?: string }).public === "1";
+  const { padrao, grupos } = loadCouncil();
+  return { padrao, grupos, professores: await professorCoverage(publicOnly) };
+});
+
+/**
+ * Conselho de professores em SSE. Os professores escrevem em paralelo, então cada evento diz de
+ * quem é: professores → sources (por professor) → delta (por professor, intercalados) →
+ * perspectiva (fim de cada um) → delta/perspectiva da síntese → done.
+ */
+app.post("/api/council", async (req, reply) => {
+  const parsed = CouncilBody.safeParse(req.body);
+  if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+  try {
+    selectProfessors(loadCouncil(), parsed.data.professors);
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+
+  reply.hijack();
+  const res = reply.raw;
+  res.writeHead(200, {
+    "content-type": "text/event-stream; charset=utf-8",
+    "cache-control": "no-cache, no-transform",
+    connection: "keep-alive",
+    "x-accel-buffering": "no",
+  });
+  const abort = new AbortController();
+  res.on("close", () => abort.abort());
+  try {
+    await convene(parsed.data.question, {
+      professors: parsed.data.professors,
+      publicOnly: parsed.data.publicOnly,
+      signal: abort.signal,
+      onEvent: (e) => {
+        const { type, ...data } = e;
+        res.write(`event: ${type}\ndata: ${JSON.stringify(data)}\n\n`);
+      },
+    });
+  } catch (err) {
+    if (!abort.signal.aborted) {
+      req.log.error(err);
+      res.write(`event: error\ndata: ${JSON.stringify({ message: err instanceof Error ? err.message : String(err) })}\n\n`);
     }
   } finally {
     res.end();

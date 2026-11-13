@@ -2,6 +2,7 @@ import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { getHealth, type Health } from "./api";
 import { Ask } from "./views/Ask";
+import { Council } from "./views/Council";
 import { Evaluation } from "./views/Evaluation";
 import { Graph } from "./views/Graph";
 import { Library } from "./views/Library";
@@ -9,6 +10,7 @@ import "./styles.css";
 
 const TABS = [
   { id: "perguntar", label: "Perguntar" },
+  { id: "conselho", label: "Conselho" },
   { id: "grafo", label: "Grafo" },
   { id: "acervo", label: "Acervo" },
   { id: "avaliacao", label: "Avaliação" },
@@ -70,6 +72,8 @@ function App() {
           <p className="muted italic">Abrindo o acervo…</p>
         ) : tab === "perguntar" ? (
           <Ask publicOnly={publicOnly} health={health} onPublicOnly={setPublicOnly} />
+        ) : tab === "conselho" ? (
+          <Council publicOnly={publicOnly} />
         ) : tab === "grafo" ? (
           <Graph />
         ) : tab === "acervo" ? (

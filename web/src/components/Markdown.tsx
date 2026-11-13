@@ -17,7 +17,7 @@ export function Markdown({
 }) {
   const inline = (s: string, key: string): ReactNode[] => {
     const out: ReactNode[] = [];
-    const re = /(\*\*[^*]+\*\*|`[^`]+`|\[\d+(?:\s*[,;–-]\s*\d+)*\])/g;
+    const re = /(\*\*[^*]+\*\*|`[^`]+`|\[geral\]|\[\d+(?:\s*[,;–-]\s*\d+)*\])/gi;
     let last = 0;
     let i = 0;
     for (const m of s.matchAll(re)) {
@@ -25,6 +25,12 @@ export function Markdown({
       const tok = m[0];
       if (tok.startsWith("**")) out.push(<strong key={`${key}-${i++}`}>{tok.slice(2, -2)}</strong>);
       else if (tok.startsWith("`")) out.push(<code key={`${key}-${i++}`}>{tok.slice(1, -1)}</code>);
+      else if (/^\[geral\]$/i.test(tok))
+        out.push(
+          <span key={`${key}-${i++}`} className="geral" title="Conhecimento geral da área, sem trecho do acervo que sustente">
+            geral
+          </span>,
+        );
       else {
         const inner = tok.slice(1, -1);
         const range = /^(\d+)\s*[–-]\s*(\d+)$/.exec(inner);

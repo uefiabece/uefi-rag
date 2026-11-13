@@ -8,6 +8,7 @@
     "graph": "tsx src/cli.ts graph",
     "search": "tsx src/cli.ts search",
     "ask": "tsx src/cli.ts ask",
+    "council": "tsx src/cli.ts council",
     "serve": "tsx src/api.ts",
     "mcp": "tsx src/mcp.ts",
     "eval": "tsx src/cli.ts eval",

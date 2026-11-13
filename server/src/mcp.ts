@@ -109,4 +109,44 @@ server.registerTool(
   },
 );
 
+server.registerTool(
+  "conselho_de_professores",
+  {
+    title: "Material para um conselho de professores",
+    description:
+      "Prepara a mesma pergunta para professores de cursos diferentes da UFABC (um por curso: engenharias, exatas, " +
+      "humanas, licenciaturas e os interdisciplinares de ingresso): para cada um, a lente da área e os trechos do acervo " +
+      "daquela área. Use para explicar uma questão por várias perspectivas; o que não tiver trecho deve ser apresentado " +
+      "como conhecimento geral, sem citação. Sem 'professores', usa o conselho padrão.",
+    inputSchema: {
+      pergunta: z.string().min(2),
+      professores: z
+        .array(z.string())
+        .min(2)
+        .max(5)
+        .optional()
+        .describe("ids, ex.: neurociencia, computacao, historia, eng-energia, politicas-publicas"),
+    },
+    annotations: { readOnlyHint: true },
+  },
+  async ({ pergunta, professores }) => {
+    const council = await get<{ padrao: string[]; professores: { id: string; titulo: string; area: string; repos: string[]; lente: string; documentos: number }[] }>(
+      "/api/council",
+    );
+    const wanted = professores?.length ? professores : council.padrao;
+    const blocks: string[] = [];
+    for (const p of council.professores.filter((x) => wanted.includes(x.id))) {
+      let material = "Sem material desta área no acervo: tudo o que este professor disser é conhecimento geral.";
+      if (p.repos.length && p.documentos > 0) {
+        const params = new URLSearchParams({ q: pergunta, k: "5", repo: p.repos.join(",") });
+        const { hits } = await get<{ hits: Hit[] }>(`/api/search?${params}`);
+        if (hits.length) material = formatHits(hits);
+      }
+      blocks.push(`# ${p.titulo}\nLente: ${p.lente}\n\n${material}`);
+    }
+    if (!blocks.length) return text(`Nenhum professor encontrado entre: ${wanted.join(", ")}.`);
+    return text(blocks.join("\n\n═════\n\n"));
+  },
+);
+
 await server.connect(new StdioServerTransport());

@@ -18,6 +18,7 @@ const { values, positionals } = parseArgs({
     limit: { type: "string" },
     "no-answers": { type: "boolean" },
     label: { type: "string" },
+    prof: { type: "string" },
   },
 });
 
@@ -83,6 +84,27 @@ async function main() {
       if (result.citations.invalid.length) console.log(`  citações sem fonte: ${result.citations.invalid.join(", ")}`);
       break;
     }
+    case "council": {
+      const { convene, loadCouncil, SYNTHESIS_ID } = await import("./council.js");
+      const names = new Map(loadCouncil().professores.map((p) => [p.id, p.titulo]));
+      names.set(SYNTHESIS_ID, "Síntese do conselho");
+      // Os professores escrevem em paralelo; no terminal, cada perspectiva sai inteira quando termina.
+      const buffers = new Map<string, string>();
+      await convene(positionals.join(" "), {
+        professors: values.prof ? values.prof.split(",") : undefined,
+        publicOnly: values.public,
+        onEvent: (e) => {
+          if (e.type === "sources") console.log(`· ${names.get(e.professor)}: ${e.sources.length} trechos do acervo da área`);
+          if (e.type === "delta") buffers.set(e.professor, (buffers.get(e.professor) ?? "") + e.text);
+          if (e.type === "perspectiva") {
+            const stats = e.error ? `erro: ${e.error}` : `${e.citations.valid.length} citações · ${e.general} [geral] · ${e.latencyMs} ms`;
+            console.log(`\n── ${names.get(e.professor)} (${stats})\n\n${buffers.get(e.professor) ?? ""}`);
+          }
+          if (e.type === "done") console.log(`\n— ${e.latencyMs} ms · ${e.inputTokens + e.outputTokens} tokens`);
+        },
+      });
+      break;
+    }
     case "graph": {
       const { buildGraph } = await import("./graph.js");
       const stats = await buildGraph(console.log);
@@ -106,7 +128,7 @@ async function main() {
       break;
     }
     default:
-      console.log("Comandos: ingest [--reset] [--force] [--repo X] | search <consulta> | ask <pergunta> | graph | eval | export");
+      console.log("Comandos: ingest [--reset] [--force] [--repo X] | search <consulta> | ask <pergunta> | council <pergunta> [--prof a,b] | graph | eval | export");
   }
 }
 

@@ -3,12 +3,16 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "workspaces": ["server", "web"],
+  "workspaces": [
+    "server",
+    "web"
+  ],
   "scripts": {
     "ingest": "npm run ingest -w server",
     "graph": "npm run graph -w server",
     "search": "npm run search -w server",
     "ask": "npm run ask -w server",
+    "council": "npm run council -w server",
     "serve": "npm run serve -w server",
     "mcp": "npm run mcp -w server",
     "eval": "npm run eval -w server",
