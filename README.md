@@ -1,6 +1,6 @@
 # Acervo UFABC
 
-**RAG sobre os repositórios UÉFIabecê, por Arthur Gaspar.** Ementas, PPCs, provas antigas, listas e notas de aula de cursos da UFABC, em PDF bagunçado e Markdown, viram um acervo consultável: busca híbrida com pgvector, respostas em streaming com cada afirmação citando o trecho de origem, um grafo que liga disciplinas, conceitos e livros, e uma avaliação automatizada que diz quanto disso funciona.
+**RAG sobre os repositórios UÉFIabecê.** Ementas, PPCs, provas antigas, listas e notas de aula de cursos da UFABC, em PDF bagunçado e Markdown, viram um acervo consultável: busca híbrida com pgvector, respostas em streaming com cada afirmação citando o trecho de origem, um grafo que liga disciplinas, conceitos e livros, e uma avaliação automatizada que diz quanto disso funciona.
 
 Node + TypeScript · PostgreSQL com pgvector (PGlite embutido ou Docker) · bge-m3 via Ollama · Claude (Anthropic SDK), OpenAI ou Ollama · React + Vite · MCP
 
