@@ -1,0 +1,25 @@
+{
+  "name": "@ufabc-rag/web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/d3-force": "^3.0.10",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  },
+  "dependencies": {
+    "d3-force": "^3.0.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}

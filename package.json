@@ -1,0 +1,21 @@
+{
+  "name": "ufabc-rag",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": ["server", "web"],
+  "scripts": {
+    "ingest": "npm run ingest -w server",
+    "graph": "npm run graph -w server",
+    "search": "npm run search -w server",
+    "ask": "npm run ask -w server",
+    "serve": "npm run serve -w server",
+    "mcp": "npm run mcp -w server",
+    "eval": "npm run eval -w server",
+    "export": "npm run export -w server",
+    "dev": "npm run dev -w web",
+    "build": "npm run build -w web",
+    "test": "npm test -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w web"
+  }
+}

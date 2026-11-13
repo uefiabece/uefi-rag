@@ -1,0 +1,86 @@
+{
+  "$comment": "Onde estão os repositórios UÉFIabecê e quais entram no acervo. UEFI_ROOT no .env sobrescreve uefiRoot. Repositórios 'privado' só são indexados localmente: nunca entram no export público (web/public/demo). 'include' padrão: content/**.",
+  "uefiRoot": "../../../UEFIabc",
+  "repos": [
+    {
+      "name": "uefi-uefimcp-bct",
+      "visibility": "publico"
+    },
+    {
+      "name": "uefi-uefimcp-biotec",
+      "visibility": "publico"
+    },
+    {
+      "name": "uefi-uefimcp-neuro",
+      "visibility": "publico"
+    },
+    {
+      "name": "uefi-uefimcp",
+      "visibility": "publico"
+    },
+    {
+      "name": "uefi-context",
+      "visibility": "publico",
+      "kind": "ecossistema",
+      "include": [
+        "README.md",
+        "projects/**",
+        "decisions/**",
+        "docs/conventions.md"
+      ]
+    },
+    {
+      "name": "uefi-tutorial",
+      "visibility": "publico",
+      "kind": "ecossistema",
+      "include": [
+        "README.md",
+        "tutorials/**"
+      ]
+    },
+    {
+      "name": "uefi-uefimcp-bm",
+      "visibility": "privado"
+    },
+    {
+      "name": "uefi-uefimcp-femec",
+      "visibility": "privado"
+    },
+    {
+      "name": "uefi-uefimcp-fvv",
+      "visibility": "privado"
+    },
+    {
+      "name": "uefi-uefimcp-pd",
+      "visibility": "privado"
+    },
+    {
+      "name": "uefi-uefimcp-engenharias",
+      "visibility": "privado"
+    },
+    {
+      "name": "uefi-uefimcp-introducao-a-biotec",
+      "visibility": "privado"
+    },
+    {
+      "name": "uefi-uefimcp-introducao-a-neuro",
+      "visibility": "privado"
+    },
+    {
+      "name": "uefi-uefimcp-introducao-as-engenharias",
+      "visibility": "privado"
+    }
+  ],
+  "extensions": [
+    ".md",
+    ".txt",
+    ".pdf"
+  ],
+  "exclude": [
+    "**/ilide.info-*.pdf",
+    "**/media/**",
+    "**/scripts/**",
+    "**/.gitkeep"
+  ],
+  "maxPdfPages": 400
+}
