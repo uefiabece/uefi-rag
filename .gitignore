@@ -5,3 +5,4 @@ dist/
 eval/resultados/privado/
 *.log
 todo.txt
+__pycache__/

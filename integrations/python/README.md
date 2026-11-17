@@ -4,7 +4,7 @@ Há dois jeitos de um servidor MCP usar o acervo. Nos dois, a API precisa estar 
 
 ## 1. Servidor MCP próprio do acervo
 
-`npm run mcp` sobe um servidor MCP (stdio) com três ferramentas: `buscar_acervo`, `contexto_disciplina` e `listar_documentos`. Ele pode ser registrado no Claude Desktop ou no Claude Code ao lado dos servidores de disciplina:
+`npm run mcp` sobe um servidor MCP (stdio) com quatro ferramentas: `buscar_acervo`, `contexto_disciplina`, `conselho_de_professores` e `listar_documentos`. Ele pode ser registrado no Claude Desktop ou no Claude Code ao lado dos servidores de disciplina:
 
 ```json
 {

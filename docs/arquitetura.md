@@ -1,0 +1,129 @@
+# Arquitetura
+
+## Visão geral
+
+```
+┌──────────────── server/ (Node + TS, tsx) ────────────────┐        ┌──── web/ (React + Vite) ────┐
+│                                                          │        │                              │
+│  sources → extract → clean → chunk → embed → ingest ──┐  │        │  Perguntar  Conselho  Grafo  │
+│                                                       ▼  │  HTTP  │  Acervo     Avaliação        │
+│                                    Postgres + pgvector   │◄──────►│                              │
+│  graph (regras) ─────────────────► (PGlite ou Docker)    │  SSE   │  sem API → web/public/demo/  │
+│                                                       ▲  │        └──────────────────────────────┘
+│  retrieve ◄── answer / council ◄── api.ts (Fastify) ──┘  │
+│                                        ▲                 │
+│                                   mcp.ts (stdio, cliente HTTP da API)
+│  eval.ts · export.ts · cli.ts                            │
+└──────────────────────────────────────────────────────────┘
+```
+
+Um único processo abre o banco (a API, ou um comando de terminal). Tudo o que precisa do índice enquanto a API roda — o servidor MCP, a integração Python, a interface — passa pela API HTTP.
+
+## Ingestão
+
+`npm run ingest` → `ingest.ts`.
+
+1. **Descoberta** (`sources.ts`). Para cada repositório de `corpus.config.json` encontrado em `uefiRoot`, percorre os arquivos que casam `include` (padrão `content/**`), têm extensão em `extensions` e não casam `exclude`. Cada arquivo vira um `SourceFile`:
+   - `id` = `<repo>/<caminho relativo>` (chave primária em todo o sistema);
+   - `section` = a pasta logo abaixo de `content/` (`syllabus`, `exams`, `exercises`, `notes`, `bibliography`, `flashcards`), `ecossistema` para repositórios `kind: "ecossistema"`, ou `outros`;
+   - `subject`/`course` vêm de `config/subject.json` do repositório (`subject_name`, `course_name`), com o nome do repositório como recuo.
+2. **Extração** (`extract.ts`). PDF via `unpdf` (pdf.js): o texto de cada página é remontado a partir da posição e do tamanho dos fragmentos, o que separa parágrafos pelo espaçamento e manda notas de rodapé (fonte menor) para o fim da página. Limite de `maxPdfPages` páginas. `.md` e `.txt` viram uma "página" só.
+3. **Limpeza** (`clean.ts`). Normaliza caracteres, remove cabeçalhos e rodapés repetidos (idênticos entre páginas, ou cujo único número acompanha o número da página), junta hifenização, reflui linhas de um mesmo parágrafo preservando listas e títulos. Produz o diagnóstico `Quality` (`flags`, `emptyPages`, `removedBoilerplate`, `garbledRatio`), gravado em `documents.quality`.
+4. **Chunking** (`chunk.ts`). Corta por títulos Markdown, títulos numerados de PDF e enunciados de questão; dentro disso, por tamanho (`DEFAULT_CHUNKING`: alvo 1100, máximo 1800, mínimo 250 tokens estimados, sobreposição 200). Cada trecho guarda `heading` e `page_start`/`page_end`.
+5. **Embedding** (`embed.ts`). O texto embedado é `"<disciplina> › <documento> › <título>\n\n<trecho>"` (`contextualize`). Lotes de 16.
+6. **Gravação**. Uma transação por documento: apaga o documento antigo (cascata nos trechos) e insere de novo.
+
+### Incrementalidade
+
+- Arquivo com o mesmo SHA-256 do que está no banco é pulado (a menos que `--force`).
+- Dentro de um arquivo alterado, cada trecho tem `text_hash = sha256(modelo + "\n" + texto contextualizado)`. Trechos cujo hash já existia reaproveitam o vetor antigo.
+- Documentos que sumiram dos repositórios são removidos — só dentro do escopo da execução (com `--repo` ou `--public`, só os repositórios abrangidos).
+- A ingestão é retomável: cada documento é gravado ao terminar, então interromper e rodar de novo continua de onde parou.
+
+## Grafo de contexto
+
+`npm run graph` → `graph.ts`. Relê os arquivos (não o banco) e aplica parsers determinísticos:
+
+| Fonte | Parser | Produz |
+|---|---|---|
+| Ementas no formato do Catálogo de Disciplinas (seção `syllabus`) | `parseEmenta` | disciplina (código, TPEI, ementa), conceitos, livros, recomendações |
+| Tabelas de currículo em Markdown | `parseCurriculum` | disciplina → curso, com categoria e eixo |
+| Tabelas de disciplinas nos PPCs 202x e listas de opção limitada (PDF) | `parseCodeTable` | disciplina → curso |
+
+Tipos de nó: `disciplina`, `conceito`, `livro`, `curso` (id `<tipo>:<chave normalizada>`). Tipos de aresta: `aborda`, `bibliografia_basica`, `bibliografia_complementar`, `recomenda`, `pertence`, `compartilha` (derivada: disciplinas com conceitos ou livros em comum). Cada nó e aresta carrega `evidence` com o documento de origem e sua visibilidade, o que permite filtrar o grafo para o público.
+
+O grafo é reconstruído do zero a cada execução e precisa ser refeito depois de ingestões que mudem ementas ou currículos.
+
+## Resposta (`/api/ask`)
+
+`answer.ts`:
+
+1. `retrievalQuery`: pergunta de seguimento curta (< 80 caracteres) é concatenada à pergunta anterior do usuário para a busca.
+2. Em paralelo: `search` (k = 8) e `graphContext` (até 3 nós do grafo citados na pergunta, texto limitado a 3000 caracteres).
+3. `toSources`: trechos numerados de 1 a n; o contexto do grafo, se houver, entra como fonte n + 1.
+4. Prompt: `SYSTEM_PROMPT` + últimas 6 mensagens do histórico + mensagem com `<fontes>` (cada uma como `<fonte n=… disciplina=… documento=… tipo=… secao=… paginas=…>`) e `<pergunta>`.
+5. Streaming pelo `Generator` configurado. As fontes são emitidas antes do primeiro token.
+6. `parseCitations` separa citações válidas (1 ≤ n ≤ número de fontes) e inválidas.
+
+## Busca (`retrieve.ts`)
+
+- **Vetorial**: distância cosseno no índice HNSW, 40 candidatos.
+- **Léxica**: `tsvector` em português sobre `f_unaccent(heading)` (peso A) e `f_unaccent(text)` (peso B). A consulta é um OR entre os lexemas da pergunta, ordenado primeiro pela **cobertura** (quantos lexemas distintos o trecho contém) e depois por `ts_rank_cd`. 40 candidatos.
+- **Fusão**: Reciprocal Rank Fusion com `k = 60`; a lista léxica pesa `LEXICAL_WEIGHT` (padrão 0,5), a vetorial pesa 1.
+- **Diversidade**: no máximo `perDoc` trechos por documento (3 na resposta, 2 no conselho).
+- Filtros: `repos`, `sections`, `publicOnly` (que também é forçado por `PUBLIC_ONLY=1`).
+
+O porquê de cada escolha está em [avaliacao.md](avaliacao.md).
+
+## Conselho de professores (`/api/council`)
+
+`council.ts`:
+
+1. `selectProfessors`: de 2 a 5 ids de `conselho.config.json` (ou `padrao`), sempre na ordem da configuração.
+2. Para cada professor, em paralelo: busca restrita a `repos` do professor (k = 5, `perDoc` = 2); professor sem repositório não recebe fontes. Gera com `professorPrompt` (lente da área, nomes dos colegas, regra de citar `[n]` e marcar `[geral]`).
+3. Cada perspectiva termina com um evento `perspectiva` contendo citações, contagem de `[geral]` e `grounded` (se recebeu fontes). Falha de um professor não derruba os outros.
+4. Com pelo menos duas perspectivas não vazias, a síntese (`SYNTHESIS_PROMPT`, id `sintese`) é gerada a partir delas, sem acesso às fontes e proibida de trazer fatos novos.
+
+Custo: N + 1 chamadas ao modelo.
+
+## Geração (`generate.ts`)
+
+Interface `Generator.stream(system, messages, onText, signal)`. Implementações:
+
+| Provedor | Modelo padrão | Observações |
+|---|---|---|
+| `anthropic` | `claude-opus-5` | SDK oficial, `thinking: adaptive`, `max_tokens` 16000, fallback do lado do servidor em caso de recusa |
+| `openai` | `gpt-5` | Chat Completions em streaming |
+| `ollama` | `qwen2.5:7b` | `/api/chat`, `num_ctx` 16384, temperatura 0,2 |
+
+Embeddings (`embed.ts`): `ollama` (padrão `bge-m3`) ou `openai` (padrão `text-embedding-3-small`).
+
+## Modelo de dados
+
+Definido em `server/src/db.ts` e aplicado (idempotente) a cada abertura do banco.
+
+| Tabela | Chave | Conteúdo |
+|---|---|---|
+| `meta` | `key` | `embedding` = `"<modelo>:<dimensão>"` do índice atual |
+| `documents` | `id` (`<repo>/<caminho>`) | repo, path, section, subject, course, visibility, format, title, sha256, pages, chars, quality (jsonb), ingested_at |
+| `chunks` | `id` (bigserial) | doc_id → documents (cascata), ord, heading, page_start, page_end, text, text_hash, tokens, embedding `vector(d)`, tsv (gerada) |
+| `graph_nodes` | `id` | type, label, data (jsonb, inclui visibilidade e códigos) |
+| `graph_edges` | (src, dst, type) | weight, evidence (jsonb: documento, visibilidade, detalhe) |
+
+Índices: GIN em `chunks.tsv`, HNSW (`vector_cosine_ops`) em `chunks.embedding` criado quando a dimensão é conhecida, B-tree em `chunks.doc_id`.
+
+`f_unaccent` é um invólucro `IMMUTABLE` de `unaccent`, necessário para usá-lo na coluna gerada.
+
+A camada `Db` expõe `query`, `exec`, `transaction` e `close` com a mesma forma para PGlite (WASM, em `data/pglite`) e `pg` (Postgres real via `DATABASE_URL`). O schema é o mesmo nos dois.
+
+## Interface web
+
+`web/src/api.ts` tenta `GET api/health`; se falhar, entra em **modo demo** e lê `demo/*.json` (gerados por `npm run export`). No modo demo, Acervo, Grafo e Avaliação funcionam; Perguntar e Conselho não geram respostas. O build usa caminhos relativos (`base: "./"`), então o mesmo `web/dist` serve em localhost e no GitHub Pages.
+
+## Invariantes
+
+1. Nenhum conteúdo de repositório `privado` sai do ambiente local: `export.ts` filtra por `visibility = 'publico'` e só grava o relatório de avaliação se todos os itens forem públicos; resultados privados vão para `eval/resultados/privado/` (no `.gitignore`).
+2. Um índice, um espaço vetorial: `ensureEmbeddingSpace` recusa abrir com modelo ou dimensão diferentes dos gravados em `meta`.
+3. Um processo por banco PGlite.
+4. Toda citação exibida é verificável: o número aponta para uma fonte enviada no mesmo stream, ou é marcado como inválido.
+5. Todo professor do conselho aponta só para repositórios existentes em `corpus.config.json`.
