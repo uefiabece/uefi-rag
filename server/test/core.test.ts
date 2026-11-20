@@ -17,7 +17,7 @@ import {
   type GraphNode,
 } from "../src/graph.js";
 import { fuse } from "../src/retrieve.js";
-import { globToRegExp } from "../src/sources.js";
+import { globRoots, globToRegExp, resolveRepos } from "../src/sources.js";
 
 describe("limpeza de PDF", () => {
   it("remove cabeçalho e rodapé repetidos em todas as páginas", () => {
@@ -232,5 +232,35 @@ describe("descoberta de arquivos", () => {
     expect(globToRegExp("**/media/**").test("content/media/img.png")).toBe(true);
     expect(globToRegExp("**/ilide.info-*.pdf").test("content/bibliography/ilide.info-bear.pdf")).toBe(true);
     expect(globToRegExp("README.md").test("docs/README.md")).toBe(false);
+  });
+
+  it("descobre repositórios por padrão de nome, sempre privados, sem sobrescrever os declarados", () => {
+    const repos = resolveRepos(
+      {
+        repos: [
+          { name: "uefi-uefimcp-bct", visibility: "publico" },
+          { name: "uefi-context", visibility: "publico", kind: "ecossistema" },
+        ],
+        discover: ["uefi-uefimcp-*"],
+      },
+      ["uefi-uefimcp-mat", "uefi-uefimcp-bct", "uefi-uefimcp", "uefi-prompts", "uefi-uefimcp-aero", "UEFI-UEFIMCP-BCT"],
+    );
+    expect(repos.map((r) => [r.name, r.visibility, r.discovered])).toEqual([
+      ["uefi-uefimcp-bct", "publico", false],
+      ["uefi-context", "publico", false],
+      ["uefi-uefimcp-aero", "privado", true],
+      ["uefi-uefimcp-mat", "privado", true],
+    ]);
+  });
+
+  it("começa a busca só nas pastas fixas dos globs de include", () => {
+    expect(globRoots(["content/**"])).toEqual(["content"]);
+    expect(globRoots(["README.md", "projects/**", "docs/conventions.md"])).toEqual(["README.md", "projects", "docs/conventions.md"]);
+    expect(globRoots(["docs/**", "docs/a/*.md"])).toEqual(["docs"]);
+    expect(globRoots(["content/**", "**/README.md"])).toEqual([""]);
+  });
+
+  it("sem discover, só os repositórios declarados", () => {
+    expect(resolveRepos({ repos: [{ name: "a", visibility: "privado" }] }, ["uefi-uefimcp-mat"]).map((r) => r.name)).toEqual(["a"]);
   });
 });

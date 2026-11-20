@@ -23,7 +23,7 @@ Um único processo abre o banco (a API, ou um comando de terminal). Tudo o que p
 
 `npm run ingest` → `ingest.ts`.
 
-1. **Descoberta** (`sources.ts`). Para cada repositório de `corpus.config.json` encontrado em `uefiRoot`, percorre os arquivos que casam `include` (padrão `content/**`), têm extensão em `extensions` e não casam `exclude`. Cada arquivo vira um `SourceFile`:
+1. **Descoberta** (`sources.ts`). Os repositórios são os declarados em `repos` mais as pastas de `uefiRoot` que casam `discover` (`resolveRepos`; descobertos são sempre `privado`). Em cada um, percorre só as pastas fixas dos globs de `include` (padrão `content/**`, então `.venv`, `src` etc. nem são lidos) e fica com os arquivos que casam `include`, têm extensão em `extensions` e não casam `exclude`. Cada arquivo vira um `SourceFile`:
    - `id` = `<repo>/<caminho relativo>` (chave primária em todo o sistema);
    - `section` = a pasta logo abaixo de `content/` (`syllabus`, `exams`, `exercises`, `notes`, `bibliography`, `flashcards`), `ecossistema` para repositórios `kind: "ecossistema"`, ou `outros`;
    - `subject`/`course` vêm de `config/subject.json` do repositório (`subject_name`, `course_name`), com o nome do repositório como recuo.
@@ -35,10 +35,14 @@ Um único processo abre o banco (a API, ou um comando de terminal). Tudo o que p
 
 ### Incrementalidade
 
-- Arquivo com o mesmo SHA-256 do que está no banco é pulado (a menos que `--force`).
+- Arquivo com o mesmo SHA-256 e a mesma visibilidade do que está no banco é pulado (a menos que `--force`). Mudar a visibilidade de um repositório regrava os documentos dele, reaproveitando os embeddings.
 - Dentro de um arquivo alterado, cada trecho tem `text_hash = sha256(modelo + "\n" + texto contextualizado)`. Trechos cujo hash já existia reaproveitam o vetor antigo.
 - Documentos que sumiram dos repositórios são removidos — só dentro do escopo da execução (com `--repo` ou `--public`, só os repositórios abrangidos).
 - A ingestão é retomável: cada documento é gravado ao terminar, então interromper e rodar de novo continua de onde parou.
+
+### Tempo
+
+O custo é dominado pelo embedding: cada trecho é uma passagem pelo modelo (com Ollama, em CPU se não houver GPU). O tempo cresce com a quantidade de texto extraído — um livro de 400 páginas rende centenas de trechos, um Markdown curto rende um ou dois —, não com o número de arquivos nem com a visibilidade do repositório. `--public` e `--repo` são filtros de escopo: o arquivo passa pelo mesmo pipeline. Se uma execução com `--public` termina antes, é só porque os repositórios públicos têm menos texto naquele momento.
 
 ## Grafo de contexto
 

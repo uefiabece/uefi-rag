@@ -19,6 +19,8 @@ export interface RepoConfig {
 export interface CorpusConfig {
   uefiRoot: string;
   repos: RepoConfig[];
+  /** Globs de nomes de pasta em uefiRoot que entram sozinhos, sempre como `privado`. */
+  discover?: string[];
   extensions: string[];
   exclude: string[];
   maxPdfPages: number;

@@ -41,6 +41,7 @@ Três fontes de configuração, todas na raiz do repositório:
       "include": ["README.md", "projects/**"]
     }
   ],
+  "discover": ["uefi-uefimcp-*"],      // pastas de uefiRoot que entram sozinhas, como privado
   "extensions": [".md", ".txt", ".pdf"],
   "exclude": ["**/media/**", "**/scripts/**"],
   "maxPdfPages": 400
@@ -49,8 +50,9 @@ Três fontes de configuração, todas na raiz do repositório:
 
 | Campo | Significado |
 |---|---|
-| `repos[].name` | Nome da pasta dentro de `uefiRoot`. Repositório ausente é listado como "não encontrado" na ingestão, sem erro. |
+| `repos[].name` | Nome da pasta dentro de `uefiRoot`. Repositório ausente é listado como "não encontrado" na ingestão, sem erro. Uma entrada aqui tem precedência sobre `discover`. |
 | `repos[].visibility` | `publico` ou `privado`. Privado é indexado localmente, mas nunca exportado. |
+| `discover` | Globs de nomes de pasta em `uefiRoot`. Pastas que casam e não estão em `repos` entram como repositório de disciplina **sempre `privado`**. Para tornar um deles público (ou mudar `include`/`kind`), declare-o em `repos`. A ingestão lista os descobertos que tinham arquivos. |
 | `repos[].kind` | `disciplina` (padrão) ou `ecossistema`. Repositórios de disciplina leem `config/subject.json` e derivam a seção da pasta em `content/`. |
 | `repos[].include` | Globs relativos ao repositório. Padrão: `["content/**"]`. |
 | `extensions` | Extensões aceitas (minúsculas, com ponto). |

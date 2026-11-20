@@ -13,7 +13,7 @@ export interface IngestOptions {
   reset?: boolean;
   force?: boolean;
   repo?: string;
-  /** Só repositórios públicos: útil para montar a demo sem esperar pelo acervo inteiro. */
+  /** Só repositórios públicos: o que a demo estática pode exportar. Filtra escopo, não muda o processamento. */
   publicOnly?: boolean;
   log?: (line: string) => void;
 }
@@ -29,6 +29,8 @@ export interface IngestReport {
   embedded: number;
   reusedEmbeddings: number;
   missingRepos: string[];
+  /** Repositórios que entraram por `discover` e têm ao menos um arquivo. */
+  discoveredRepos: string[];
   seconds: number;
 }
 
@@ -68,7 +70,9 @@ export async function ingest(opts: IngestOptions = {}): Promise<IngestReport> {
   await ensureEmbeddingSpace(db, embedder.model, await embedder.dim());
 
   const known = new Map(
-    (await db.query<{ id: string; sha256: string }>("SELECT id, sha256 FROM documents")).rows.map((r) => [r.id, r.sha256]),
+    (await db.query<{ id: string; sha256: string; visibility: string }>("SELECT id, sha256, visibility FROM documents")).rows.map(
+      (r) => [r.id, r],
+    ),
   );
 
   const report: IngestReport = {
@@ -82,6 +86,7 @@ export async function ingest(opts: IngestOptions = {}): Promise<IngestReport> {
     embedded: 0,
     reusedEmbeddings: 0,
     missingRepos: repos.filter((r) => !r.found).map((r) => r.name),
+    discoveredRepos: repos.filter((r) => r.discovered && files.some((f) => f.repo === r.name)).map((r) => r.name),
     seconds: 0,
   };
 
@@ -90,7 +95,10 @@ export async function ingest(opts: IngestOptions = {}): Promise<IngestReport> {
     try {
       const bytes = readFileSync(file.absPath);
       const hash = sha256(bytes);
-      if (!opts.force && known.get(file.id) === hash) {
+      // Visibilidade diferente também regrava: um repositório que deixa de ser público (ou passa a ser)
+      // não pode ficar com a marca antiga só porque os bytes não mudaram. Os embeddings são reaproveitados.
+      const prev = known.get(file.id);
+      if (!opts.force && prev?.sha256 === hash && prev.visibility === file.visibility) {
         report.unchanged++;
         continue;
       }

@@ -1,5 +1,5 @@
 {
-  "$comment": "Onde estão os repositórios UÉFIabecê e quais entram no acervo. UEFI_ROOT no .env sobrescreve uefiRoot. Repositórios 'privado' só são indexados localmente: nunca entram no export público (web/public/demo). 'include' padrão: content/**.",
+  "$comment": "Onde estão os repositórios UÉFIabecê e quais entram no acervo. UEFI_ROOT no .env sobrescreve uefiRoot. Repositórios 'privado' só são indexados localmente: nunca entram no export público (web/public/demo). 'include' padrão: content/**. Pastas que casam 'discover' e não estão em 'repos' entram sozinhas, sempre como 'privado'; para torná-las públicas, declare-as em 'repos'.",
   "uefiRoot": "../../../UEFIabc",
   "repos": [
     {
@@ -70,6 +70,9 @@
       "name": "uefi-uefimcp-introducao-as-engenharias",
       "visibility": "privado"
     }
+  ],
+  "discover": [
+    "uefi-uefimcp-*"
   ],
   "extensions": [
     ".md",

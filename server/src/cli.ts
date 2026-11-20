@@ -45,6 +45,7 @@ async function main() {
           `${report.reusedEmbeddings} reaproveitados) · ${report.seconds}s`,
       );
       if (report.missingRepos.length) console.log(`Repositórios não encontrados: ${report.missingRepos.join(", ")}`);
+      if (report.discoveredRepos.length) console.log(`Descobertos automaticamente (privado): ${report.discoveredRepos.join(", ")}`);
       if (report.flagged.length) {
         console.log("\nDocumentos com problema de extração:");
         for (const f of report.flagged) console.log(`  ${f.flags.join(", ").padEnd(28)} ${f.id}`);

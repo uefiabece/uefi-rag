@@ -26,7 +26,7 @@ Mudanças que afetam qualidade de recuperação ou de resposta também passam pe
 
 ### Adicionar um repositório ao acervo
 
-1. Acrescente `{ "name": "...", "visibility": "publico" | "privado" }` em `corpus.config.json`.
+1. Repositório `uefi-uefimcp-*` privado: nada a fazer, ele entra por `discover`. Público, com outro nome ou com `include` próprio: acrescente `{ "name": "...", "visibility": "publico" | "privado" }` em `repos` de `corpus.config.json`.
 2. Confira que o repositório tem `config/subject.json` e `content/<seção>/`.
 3. `npm run ingest -- --repo <nome>` e depois `npm run graph`.
 4. Se o repositório pertence à área de algum professor, acrescente-o a `repos` em `conselho.config.json` e rode `npm test`.
@@ -68,6 +68,7 @@ Revise o diff de `web/public/demo/` antes de versionar.
 | `Sem credencial da Anthropic` | Defina `ANTHROPIC_API_KEY` ou use `LLM_PROVIDER=ollama`. |
 | Servidor MCP: `A API do acervo não respondeu` | Rode `npm run serve`, ou ajuste `RAG_URL`. |
 | Repositório "não encontrado" na ingestão | `UEFI_ROOT`/`uefiRoot` aponta para o lugar errado, ou o nome da pasta difere do `name`. |
+| Repositório de `uefiRoot` não entra no acervo | O nome não casa `discover` nem está em `repos` de `corpus.config.json`, ou o `content/` dele não tem arquivos com extensão aceita (só `.gitkeep` não conta). |
 | Documento com `flags` na aba Acervo | Diagnóstico de extração: `sem-texto` (mais da metade das páginas vazias, provável digitalização), `texto-corrompido` (> 2% de glifos sem mapa Unicode), `truncado` (passou de `maxPdfPages`), `poucas-palavras`. O documento é indexado mesmo assim; a correção é na fonte. |
 | Grafo vazio ou desatualizado | `npm run graph` não roda sozinho depois de `ingest`. |
 | Interface mostra "Edição estática" localmente | `GET /api/health` falhou: a API não está rodando ou não está na porta do proxy (`web/vite.config.ts`). |

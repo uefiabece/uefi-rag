@@ -42,7 +42,7 @@ Uma pergunta ao conselho custa N + 1 chamadas ao modelo (N professores mais a s�
 
 ## Público e privado
 
-Parte dos repositórios UÉFIabecê é privada, e parte do material é bibliografia com direitos autorais. O `corpus.config.json` marca cada repositório como `publico` ou `privado`:
+Parte dos repositórios UÉFIabecê é privada, e parte do material é bibliografia com direitos autorais. O `corpus.config.json` marca cada repositório como `publico` ou `privado`; pastas `uefi-uefimcp-*` não declaradas entram sozinhas, sempre como privadas:
 
 - localmente, o acervo inteiro é indexado e consultável (a interface marca as fontes privadas);
 - `PUBLIC_ONLY=1` ou a opção "só públicos" restringe as respostas;
@@ -56,12 +56,13 @@ Pré-requisitos: Node 22 e [Ollama](https://ollama.com) com `ollama pull bge-m3`
 ```bash
 npm install
 cp .env.example .env              # ajuste UEFI_ROOT e ANTHROPIC_API_KEY
-npm run ingest -- --public        # só os repositórios públicos (minutos)
-npm run ingest                    # o acervo inteiro (horas em CPU; retomável)
+npm run ingest                    # repositórios de corpus.config.json + uefi-uefimcp-* descobertos (retomável)
 npm run graph
 npm run serve                     # API em http://127.0.0.1:8787
 npm run dev                       # interface em http://localhost:5173
 ```
+
+A primeira ingestão pode levar horas em CPU: o tempo é proporcional à quantidade de texto (cada trecho passa pelo modelo de embedding), não ao número de repositórios nem à visibilidade deles. `--repo <nome>` e `--public` só restringem quais repositórios entram; interromper e rodar de novo continua de onde parou, e as execuções seguintes só processam o que mudou.
 
 Sem chave da Anthropic, `LLM_PROVIDER=ollama` gera as respostas com um modelo local. Para usar um Postgres de verdade, `docker compose up -d` e `DATABASE_URL=postgres://rag:rag@localhost:5432/rag`. O schema é o mesmo.
 

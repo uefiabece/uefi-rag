@@ -21,6 +21,8 @@ export interface RepoInfo {
   subject: string;
   course: string | null;
   found: boolean;
+  /** Entrou por `discover`, não por uma entrada em `repos`. */
+  discovered: boolean;
 }
 
 /** Converte um glob simples (`**`, `*`) em RegExp sobre caminhos com barras normais. */
@@ -43,11 +45,39 @@ export function globToRegExp(glob: string): RegExp {
   return new RegExp(`^${re}$`, "i");
 }
 
+const SKIP_DIRS = new Set(["node_modules", "__pycache__", ".venv", "venv"]);
+
+/**
+ * Pasta fixa de cada glob (`content/**` → `content`, `README.md` → `README.md`). A busca começa
+ * nelas: os repositórios de disciplina têm `.venv` com dezenas de milhares de arquivos fora de `content/`.
+ */
+export function globRoots(globs: string[]): string[] {
+  const roots = globs.map((g) => {
+    const parts = g.split("/");
+    const wild = parts.findIndex((p) => p.includes("*"));
+    return (wild === -1 ? parts : parts.slice(0, wild)).join("/");
+  });
+  // "" (glob que começa com curinga) cobre o repositório inteiro; raízes dentro de outras são redundantes.
+  if (roots.includes("")) return [""];
+  return [...new Set(roots)].filter((r, _, all) => !all.some((o) => o !== r && r.toLowerCase().startsWith(`${o.toLowerCase()}/`)));
+}
+
+function walkFrom(repoDir: string, roots: string[]): string[] {
+  const out: string[] = [];
+  for (const root of roots) {
+    const abs = path.join(repoDir, root);
+    if (!existsSync(abs)) continue;
+    if (statSync(abs).isDirectory()) out.push(...walk(abs, repoDir));
+    else out.push(root);
+  }
+  return out;
+}
+
 function walk(dir: string, base = dir): string[] {
   const out: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.name.startsWith(".git") && entry.isDirectory()) continue;
-    if (entry.name === "node_modules" || entry.name === "__pycache__") continue;
+    if (entry.isDirectory() && SKIP_DIRS.has(entry.name)) continue;
     const abs = path.join(dir, entry.name);
     if (entry.isDirectory()) out.push(...walk(abs, base));
     else out.push(path.relative(base, abs).split(path.sep).join("/"));
@@ -68,22 +98,45 @@ function readSubject(repoDir: string, repo: RepoConfig): { subject: string; cour
   return { subject: repo.kind === "ecossistema" ? "Ecossistema UÉFIabecê" : repo.name, course: null };
 }
 
+/**
+ * Repositórios declarados em `repos` mais as pastas de `uefiRoot` que casam `discover`.
+ * Descobertos são sempre `privado`: tornar um repositório público exige declará-lo, porque
+ * público × privado é uma fronteira de direitos autorais e não pode depender de um padrão de nome.
+ */
+export function resolveRepos(config: Pick<CorpusConfig, "repos" | "discover">, dirNames: string[]): (RepoConfig & { discovered: boolean })[] {
+  const declared = new Set(config.repos.map((r) => r.name.toLowerCase()));
+  const patterns = (config.discover ?? []).map(globToRegExp);
+  const discovered = dirNames
+    .filter((name) => !declared.has(name.toLowerCase()) && patterns.some((re) => re.test(name)))
+    .sort()
+    .map((name) => ({ name, visibility: "privado" as const, discovered: true }));
+  return [...config.repos.map((r) => ({ ...r, discovered: false })), ...discovered];
+}
+
+function listDirs(root: string): string[] {
+  if (!existsSync(root)) return [];
+  return readdirSync(root, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name);
+}
+
 export function discoverSources(config: CorpusConfig): { repos: RepoInfo[]; files: SourceFile[] } {
   const exclude = config.exclude.map(globToRegExp);
   const repos: RepoInfo[] = [];
   const files: SourceFile[] = [];
 
-  for (const repo of config.repos) {
+  for (const repo of resolveRepos(config, config.discover?.length ? listDirs(config.uefiRoot) : [])) {
     const repoDir = path.join(config.uefiRoot, repo.name);
     if (!existsSync(repoDir) || !statSync(repoDir).isDirectory()) {
-      repos.push({ name: repo.name, visibility: repo.visibility, subject: repo.name, course: null, found: false });
+      repos.push({ name: repo.name, visibility: repo.visibility, subject: repo.name, course: null, found: false, discovered: repo.discovered });
       continue;
     }
     const { subject, course } = readSubject(repoDir, repo);
-    repos.push({ name: repo.name, visibility: repo.visibility, subject, course, found: true });
+    repos.push({ name: repo.name, visibility: repo.visibility, subject, course, found: true, discovered: repo.discovered });
 
-    const include = (repo.include ?? ["content/**"]).map(globToRegExp);
-    for (const rel of walk(repoDir)) {
+    const globs = repo.include ?? ["content/**"];
+    const include = globs.map(globToRegExp);
+    for (const rel of walkFrom(repoDir, globRoots(globs))) {
       const ext = path.extname(rel).toLowerCase();
       if (!config.extensions.includes(ext)) continue;
       if (!include.some((re) => re.test(rel))) continue;
