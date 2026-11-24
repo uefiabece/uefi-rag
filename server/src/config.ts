@@ -50,6 +50,8 @@ export const settings = {
   tracing: {
     endpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
     captureContent: process.env.OTEL_CAPTURE_CONTENT === "1",
+    // Grava os traces no banco para a aba Observabilidade; TRACES_LOCAL=0 desliga.
+    local: process.env.TRACES_LOCAL !== "0",
   },
   publicOnly: process.env.PUBLIC_ONLY === "1",
 };

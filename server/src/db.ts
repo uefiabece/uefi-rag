@@ -152,6 +152,23 @@ CREATE TABLE IF NOT EXISTS geracoes (
 );
 CREATE INDEX IF NOT EXISTS geracoes_consulta_idx ON geracoes (consulta);
 CREATE INDEX IF NOT EXISTS geracoes_criado_idx ON geracoes (criado_em);
+
+-- Spans do OpenTelemetry gravados localmente (traces.ts), para a aba Observabilidade. Mesmos atributos
+-- do OTLP: sem texto de trecho nem docId privado. Só os traces mais recentes ficam (MAX_TRACES).
+CREATE TABLE IF NOT EXISTS spans (
+  trace_id       text NOT NULL,
+  span_id        text NOT NULL,
+  parent_id      text,                       -- null na raiz do trace
+  name           text NOT NULL,
+  start_ms       double precision NOT NULL,  -- época em ms
+  duration_ms    double precision NOT NULL,
+  status         text NOT NULL CHECK (status IN ('ok', 'erro')),
+  status_message text,
+  attributes     jsonb NOT NULL DEFAULT '{}',
+  events         jsonb NOT NULL DEFAULT '[]',
+  PRIMARY KEY (trace_id, span_id)
+);
+CREATE INDEX IF NOT EXISTS spans_raiz_idx ON spans (start_ms DESC) WHERE parent_id IS NULL;
 `;
 
 async function migrate(db: Db) {

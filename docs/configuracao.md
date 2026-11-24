@@ -28,6 +28,7 @@ Três fontes de configuração, todas na raiz do repositório:
 | `RAG_URL` | `http://127.0.0.1:$PORT` | Endereço da API usado por `mcp.ts` e pela integração Python. |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | — | Liga os spans por etapa (OTLP/HTTP). Sem ela, nada é exportado. Ver [arquitetura.md](arquitetura.md#rastreamento-tracets). |
 | `OTEL_EXPORTER_OTLP_HEADERS` | — | Cabeçalhos do exportador, como a autenticação do Langfuse (`Authorization=Basic <base64 de pk:sk>`). |
+| `TRACES_LOCAL` | `1` | `0` desliga a gravação dos traces no banco (aba Observabilidade). Independe do OTLP. |
 | `OTEL_CAPTURE_CONTENT` | — | `1` inclui a pergunta e a resposta nos spans. Os trechos recuperados nunca entram. |
 
 ## `corpus.config.json`

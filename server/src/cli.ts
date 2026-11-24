@@ -166,11 +166,16 @@ async function main() {
   }
 }
 
-initTracing()
+// Só pergunta e conselho são uso real; eval e ingestão gravariam centenas de traces de medição.
+initTracing({ local: command === "ask" || command === "council" })
   .then(main)
-  .then(async () => (await getDb()).close())
   .catch(async (err) => {
     console.error(err instanceof Error ? err.message : err);
     process.exitCode = 1;
   })
-  .finally(flushTracing);
+  // Os spans pendentes vão para o banco antes de fechá-lo.
+  .finally(async () => {
+    await flushTracing();
+    // Se o banco nem abriu (PGlite em uso pela API), o erro já foi mostrado acima.
+    await getDb().then((db) => db.close(), () => {});
+  });

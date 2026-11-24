@@ -6,6 +6,7 @@ import { Council } from "./views/Council";
 import { Evaluation } from "./views/Evaluation";
 import { Graph } from "./views/Graph";
 import { Library } from "./views/Library";
+import { Observability } from "./views/Observability";
 import "./styles.css";
 
 const TABS = [
@@ -14,6 +15,7 @@ const TABS = [
   { id: "grafo", label: "Grafo" },
   { id: "acervo", label: "Acervo" },
   { id: "avaliacao", label: "Avaliação" },
+  { id: "observabilidade", label: "Observabilidade" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -78,8 +80,10 @@ function App() {
           <Graph />
         ) : tab === "acervo" ? (
           <Library />
-        ) : (
+        ) : tab === "avaliacao" ? (
           <Evaluation />
+        ) : (
+          <Observability />
         )}
       </main>
     </div>

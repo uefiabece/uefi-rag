@@ -5,6 +5,7 @@ import { traceGeneration } from "../src/answer.js";
 import { convene } from "../src/council.js";
 import type { Generator } from "../src/generate.js";
 import { withSpan } from "../src/trace.js";
+import { spanToRow } from "../src/traces.js";
 
 // Provedor em memória: exercita os spans sem OTEL_EXPORTER_OTLP_ENDPOINT e sem rede.
 const exporter = new InMemorySpanExporter();
@@ -86,7 +87,35 @@ describe("spans", () => {
     const historia = branches.find((b) => b.attributes["rag.professor.id"] === "historia")!;
     expect(historia.status.message).toBe("caiu");
     const sintese = childrenOf(root.spanContext().spanId).find((s) => s.name === "rag.conselho.sintese")!;
-    expect(t(sintese.startTime)).toBeGreaterThanOrEqual(Math.max(...branches.map((b) => t(b.endTime))));
+    // Tolerância de 1 ms: o relógio dos spans não tem resolução abaixo disso entre spans diferentes.
+    expect(t(sintese.startTime)).toBeGreaterThanOrEqual(Math.max(...branches.map((b) => t(b.endTime))) - 1);
     expect(root.attributes).toMatchObject({ "rag.council.perspectives": 2, "rag.council.failed": 1, "gen_ai.usage.input_tokens": 30 });
+  });
+
+  it("span vira linha da tabela: pai, duração, status, atributos e eventos relativos ao início", async () => {
+    await withSpan("rag.resposta", { "rag.k": 8 }, () =>
+      withSpan("rag.geracao", { "gen_ai.request.model": "falso" }, async (span) => {
+        await new Promise((r) => setTimeout(r, 15));
+        span.addEvent("primeiro_token");
+        throw new Error("caiu");
+      }),
+    ).catch(() => {});
+    const spans = exporter.getFinishedSpans();
+    const root = spanToRow(spans.find((s) => s.name === "rag.resposta")!);
+    const gen = spanToRow(spans.find((s) => s.name === "rag.geracao")!);
+
+    expect(root.parentId).toBeNull();
+    expect(gen.parentId).toBe(root.spanId);
+    expect(gen.traceId).toBe(root.traceId);
+    expect(gen).toMatchObject({ status: "erro", statusMessage: "caiu", attributes: { "gen_ai.request.model": "falso" } });
+    expect(root.attributes).toEqual({ "rag.k": 8 });
+    expect(gen.durationMs).toBeGreaterThanOrEqual(10);
+    expect(gen.startMs).toBeGreaterThanOrEqual(root.startMs);
+    expect(gen.events.map((e) => e.name)).toContain("primeiro_token");
+    const first = gen.events.find((e) => e.name === "primeiro_token")!;
+    expect(first.offsetMs).toBeGreaterThanOrEqual(10);
+    expect(first.offsetMs).toBeLessThanOrEqual(gen.durationMs);
+    // Linha serializável: vai para jsonb.
+    expect(JSON.parse(JSON.stringify(gen))).toEqual(gen);
   });
 });

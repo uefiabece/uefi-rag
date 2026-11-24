@@ -11,6 +11,7 @@ import { getGenerator } from "./generate.js";
 import { loadGraph } from "./graph.js";
 import { search } from "./retrieve.js";
 import { flushTracing, initTracing } from "./trace.js";
+import { getTrace, listTraces, stageStats } from "./traces.js";
 
 const app = Fastify({ logger: { level: "info" } });
 
@@ -220,6 +221,32 @@ function record(log: { error: (o: unknown, msg?: string) => void }, tipo: "respo
 app.get("/api/custos", async (req) => {
   const limit = Number((req.query as { limit?: string }).limit ?? 20);
   return costSummary(Number.isFinite(limit) ? limit : 20);
+});
+
+/**
+ * Traces gravados localmente (aba Observabilidade). Mesmos atributos do OTLP: sem texto de trecho e
+ * com docId privado mascarado, então não há filtro de visibilidade a aplicar aqui.
+ */
+const Limit = z.coerce.number().int().min(1).max(500);
+
+app.get("/api/traces", async (req, reply) => {
+  const limit = Limit.default(50).safeParse((req.query as { limit?: string }).limit);
+  if (!limit.success) return reply.code(400).send({ error: "limit deve ser um inteiro entre 1 e 500." });
+  return { traces: await listTraces(limit.data) };
+});
+
+app.get("/api/traces/etapas", async (req, reply) => {
+  const last = Limit.default(200).safeParse((req.query as { ultimos?: string }).ultimos);
+  if (!last.success) return reply.code(400).send({ error: "ultimos deve ser um inteiro entre 1 e 500." });
+  return stageStats(last.data);
+});
+
+app.get("/api/traces/:id", async (req, reply) => {
+  const { id } = req.params as { id: string };
+  if (!/^[0-9a-f]{32}$/.test(id)) return reply.code(400).send({ error: "Id de trace inválido (32 caracteres hexadecimais)." });
+  const spans = await getTrace(id);
+  if (!spans.length) return reply.code(404).send({ error: "Trace não encontrado; só os mais recentes ficam guardados." });
+  return { traceId: id, spans };
 });
 
 const shutdown = async () => {

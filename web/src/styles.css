@@ -73,7 +73,8 @@ code, .mono { font-family: var(--mono); font-size: 0.82em; }
   color: var(--ink-60);
 }
 .masthead .rule .italic { text-transform: none; letter-spacing: 0; font-size: 15px; }
-.tabs { display: flex; justify-content: center; border-top: 1px solid var(--ink-30); }
+/* Seis abas não cabem numa linha no celular: quebram em vez de empurrar a página para o lado. */
+.tabs { display: flex; flex-wrap: wrap; justify-content: center; border-top: 1px solid var(--ink-30); }
 .tabs button {
   border: 0; background: transparent; cursor: pointer; padding: 10px 18px; color: var(--ink-60);
   border-bottom: 2px solid transparent; margin-bottom: -1px;
@@ -239,6 +240,43 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .item-detail { padding: 14px 16px 18px; background: var(--ink-08); font-size: 15px; }
 .item-detail p { margin: 0 0 6px; }
 .item-detail pre { white-space: pre-wrap; font: 15px/1.55 var(--serif); margin: 10px 0 0; border-left: 2px solid var(--ink); padding-left: 14px; }
+
+/* ---------- Observabilidade */
+/* Tabelas largas rolam dentro de si; a página não rola de lado no celular. */
+.table-scroll { overflow-x: auto; }
+.stage-bars { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr) 48px 48px; gap: 8px 18px; align-items: center; font-size: 15px; }
+.stage-bars .num { text-align: right; font-variant-numeric: tabular-nums; }
+/* p95 em traço claro atrás, mediana em tinta cheia na frente: a distância entre as duas é a cauda. */
+.bar.stage { position: relative; height: 9px; }
+.bar.stage > i { position: absolute; top: 0; left: 0; }
+.bar.stage > i.p95 { background: var(--ink-30); }
+.bar.stage > i.p50 { background: var(--ink); }
+.bar-cell .stage-ms { width: 132px; font-size: 13px; color: var(--ink-60); }
+
+.waterfall { font-size: 14px; }
+.wf-axis, .wf-row { display: grid; grid-template-columns: minmax(170px, 260px) minmax(0, 1fr) 64px; gap: 12px; align-items: center; }
+.wf-axis { color: var(--ink-50); font-size: 12px; border-bottom: 1px solid var(--ink-30); padding-bottom: 4px; margin-bottom: 4px; }
+.wf-axis span { grid-column: 2; grid-row: 1; }
+.wf-axis span:nth-child(1) { justify-self: start; }
+.wf-axis span:nth-child(2) { justify-self: center; }
+.wf-axis span:nth-child(3) { justify-self: end; }
+.wf-row { padding: 3px 0; cursor: pointer; }
+.wf-row:hover, .wf-row.selected { background: var(--ink-08); }
+.wf-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wf-track { position: relative; height: 12px; border-left: 1px solid var(--ink-20); }
+.wf-track > i { position: absolute; top: 2px; height: 8px; background: var(--ink); }
+/* Erro sem cor: hachurado, como o resto da linguagem monocromática. */
+.wf-track > i.erro { background: repeating-linear-gradient(45deg, var(--ink) 0 2px, transparent 2px 5px); outline: 1px solid var(--ink); }
+.wf-track > b { position: absolute; top: -1px; width: 2px; height: 14px; background: var(--paper); box-shadow: 0 0 0 1px var(--ink); }
+.wf-ms { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-60); font-size: 13px; }
+
+@media (max-width: 720px) {
+  .tabs button { padding: 8px 10px; }
+  .stage-bars { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+  .stage-bars > :nth-child(4n + 3), .stage-bars > :nth-child(4n + 4) { display: none; }
+  .bar-cell .stage-ms { width: auto; }
+  .wf-axis, .wf-row { grid-template-columns: 110px minmax(0, 1fr) 52px; }
+}
 
 .empty-state { text-align: center; padding: 48px 0; }
 .empty-state h2 { font: 700 30px/1.2 var(--display); margin: 0 0 8px; }

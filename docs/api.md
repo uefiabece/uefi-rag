@@ -120,6 +120,18 @@ Fechar a conexão cancela a geração.
 
 Custo agregado das consultas registradas (tabela `geracoes`): `{ moeda, desde, porProvedor[], porTipo[], ultimas[] }`. `porProvedor` agrupa por provedor e modelo, com consultas, chamadas, tokens, `custoUsd` e `semPreco` (chamadas sem preço; com alguma, `custoUsd` do grupo é `null`). `porTipo` dá média e total por `resposta`/`conselho`. Só metadados: nenhuma pergunta, resposta ou trecho é gravado.
 
+### `GET /api/traces?limit=50`
+
+Traces gravados localmente, mais recentes primeiro (até 500): `{ traces: [{ traceId, name, startMs, durationMs, status, spans, errors, costUsd, inputTokens, outputTokens, invalidCitations, models, professors }] }`. `costUsd` soma o `gen_ai.usage.cost` das gerações; é `null` se alguma geração bem-sucedida não tem preço.
+
+### `GET /api/traces/etapas?ultimos=200`
+
+Tempo por etapa nos últimos traces: `{ traces, stages: [{ name, count, p50Ms, p95Ms, errors }] }`.
+
+### `GET /api/traces/:id`
+
+Os spans de um trace (`id` com 32 caracteres hexadecimais): `{ traceId, spans: [{ spanId, parentId, name, startMs, durationMs, status, statusMessage, attributes, events: [{ name, offsetMs }] }] }`. 404 se o trace já saiu da retenção.
+
 ## Servidor MCP
 
 `npm run mcp` (`server/src/mcp.ts`, stdio). Cliente fino da API: a API precisa estar rodando em `RAG_URL`.

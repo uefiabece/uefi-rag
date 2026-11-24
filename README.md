@@ -106,6 +106,6 @@ server/src/
   mcp.ts        servidor MCP (stdio)
   eval.ts       avaliação de recuperação e respostas
   export.ts     JSON da demo estática
-web/src/        React: Perguntar, Conselho, Grafo, Acervo, Avaliação
+web/src/        React: Perguntar, Conselho, Grafo, Acervo, Avaliação, Observabilidade
 eval/           perguntas.jsonl e resultados
 ```

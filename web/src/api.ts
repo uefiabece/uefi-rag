@@ -190,6 +190,76 @@ export async function getEval(): Promise<EvalReport | null> {
   }
 }
 
+// ---------------------------------------------------------------- observabilidade
+// Tipos duplicados à mão de server/src/traces.ts e server/src/cost.ts.
+
+export interface TraceSummary {
+  traceId: string;
+  name: string;
+  startMs: number;
+  durationMs: number;
+  status: "ok" | "erro";
+  spans: number;
+  errors: number;
+  costUsd: number | null;
+  inputTokens: number;
+  outputTokens: number;
+  invalidCitations: number;
+  models: string[];
+  professors: string[];
+}
+
+export interface SpanRow {
+  traceId: string;
+  spanId: string;
+  parentId: string | null;
+  name: string;
+  startMs: number;
+  durationMs: number;
+  status: "ok" | "erro";
+  statusMessage: string | null;
+  attributes: Record<string, unknown>;
+  events: { name: string; offsetMs: number }[];
+}
+
+export interface StageStats {
+  name: string;
+  count: number;
+  p50Ms: number;
+  p95Ms: number;
+  errors: number;
+}
+
+export interface CostSummary {
+  moeda: string;
+  desde: string | null;
+  porProvedor: {
+    provedor: string;
+    modelo: string;
+    consultas: number;
+    chamadas: number;
+    inputTokens: number;
+    outputTokens: number;
+    custoUsd: number | null;
+    semPreco: number;
+  }[];
+  porTipo: { tipo: string; consultas: number; custoMedioUsd: number | null; custoTotalUsd: number | null }[];
+}
+
+/** A edição estática não grava traces: sem API, a aba mostra só o aviso. */
+export async function getObservability(): Promise<{ traces: TraceSummary[]; stages: { traces: number; stages: StageStats[] }; costs: CostSummary }> {
+  const [t, stages, costs] = await Promise.all([
+    json<{ traces: TraceSummary[] }>("api/traces?limit=100"),
+    json<{ traces: number; stages: StageStats[] }>("api/traces/etapas"),
+    json<CostSummary>("api/custos"),
+  ]);
+  return { traces: t.traces, stages, costs };
+}
+
+export async function getTrace(traceId: string): Promise<SpanRow[]> {
+  return (await json<{ spans: SpanRow[] }>(`api/traces/${traceId}`)).spans;
+}
+
 export interface AskHandlers {
   onSources: (s: Source[]) => void;
   onDelta: (t: string) => void;

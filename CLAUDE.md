@@ -7,7 +7,7 @@ Guia para agentes trabalhando neste repositório. A visão de produto está no [
 RAG sobre os repositórios UÉFIabecê (material de cursos da UFABC). Monorepo npm com dois workspaces:
 
 - `server/` — Node 22 + TypeScript (ESM, executado com `tsx`, sem build). Ingestão, busca híbrida, geração, grafo, conselho de professores, API Fastify, servidor MCP, avaliação.
-- `web/` — React 19 + Vite. Abas Perguntar, Conselho, Grafo, Acervo, Avaliação. Funciona contra a API ou, sem servidor, contra os JSON estáticos de `web/public/demo/`.
+- `web/` — React 19 + Vite. Abas Perguntar, Conselho, Grafo, Acervo, Avaliação, Observabilidade. Funciona contra a API ou, sem servidor, contra os JSON estáticos de `web/public/demo/`.
 
 Todo o código, comentários, prompts, mensagens de erro e documentação são **em português**. Mantenha assim.
 
@@ -40,7 +40,7 @@ Antes de terminar uma mudança: `npm test` e `npm run typecheck`.
 - **Schema sem migrações versionadas.** `db.ts` roda `CREATE ... IF NOT EXISTS` a cada abertura. Mudança de coluna em tabela existente não é aplicada sozinha: inclua o `ALTER` idempotente no `SCHEMA` ou documente que é preciso `--reset`.
 - **Citações `[n]` são contrato.** O servidor valida com `parseCitations` (aceita `[1][3]`, `[1, 3]`, `[2–4]`); a interface marca em vermelho números inválidos. No conselho, `[geral]` marca conhecimento fora do acervo e é contado por `countGeneral`. Ao mexer em prompts (`SYSTEM_PROMPT`, `professorPrompt`, `SYNTHESIS_PROMPT`) preserve esses formatos e rode `npm run eval`.
 - **Mudanças na busca se medem.** Peso léxico, `RRF_K`, `CANDIDATES`, `perDoc`, chunking: rode `npm run eval -- --no-answers` antes e depois e registre o efeito em `docs/avaliacao.md`. Não ajuste parâmetros olhando só o conjunto que os mede.
-- **Spans não levam conteúdo do acervo.** O destino do OpenTelemetry (Langfuse, Jaeger) é externo: nunca ponha texto de trecho num atributo, troque `docId` privado por `"privado"` e passe pergunta/resposta só por `contentAttributes` (opt-in com `OTEL_CAPTURE_CONTENT=1`).
+- **Spans não levam conteúdo do acervo.** O destino do OpenTelemetry (Langfuse, Jaeger) é externo: nunca ponha texto de trecho num atributo, troque `docId` privado por `"privado"` e passe pergunta/resposta só por `contentAttributes` (opt-in com `OTEL_CAPTURE_CONTENT=1`). Os mesmos atributos vão para a tabela `spans` e para `/api/traces`, que não filtram visibilidade, então a regra vale também para eles.
 - **`conselho.config.json` só pode citar repositórios declarados em `repos` de `corpus.config.json`** — há teste para isso, e ele não enxerga os descobertos por `discover` (o teste não lê `uefiRoot`). Um `uefi-uefimcp-*` privado entra no acervo sem editar nada; para ligá-lo a um professor, declare-o em `repos` e cite-o no conselho, sem código.
 - **Contrato SSE.** Eventos de `/api/ask` (`sources`, `delta`, `done`, `error`) e de `/api/council` (`professores`, `sources`, `delta`, `perspectiva`, `done`, `error`) são consumidos por `web/src/api.ts`. Mudou um lado, mude o outro. Tipos do servidor e do cliente são duplicados à mão (não há pacote compartilhado).
 - **Grafo é por regras, sem LLM.** Os parsers em `graph.ts` são testados contra exemplos reais em `server/test/core.test.ts`; ao ajustar um parser, acrescente o caso que motivou a mudança.
@@ -70,4 +70,5 @@ Antes de terminar uma mudança: `npm test` e `npm run typecheck`.
 | Ferramentas MCP | `mcp.ts` |
 | Preços e custo por consulta | `cost.ts`, `precos.config.json` |
 | Spans por etapa (OpenTelemetry) | `trace.ts`; spans em `retrieve.ts`, `answer.ts` e `council.ts` |
+| Traces gravados e aba Observabilidade | `traces.ts`, `web/src/views/Observability.tsx` |
 | Cliente web e modo demo | `web/src/api.ts` |

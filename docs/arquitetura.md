@@ -133,7 +133,14 @@ rag.conselho                 council.professors, perspectives, failed, gen_ai.us
 
 Professor que falha marca o próprio ramo como erro e o conselho segue sem ele, como no fluxo sem tracing.
 
-Fica desligado até `OTEL_EXPORTER_OTLP_ENDPOINT` existir: sem SDK registrado, a API do OTel é no-op, e os testes e o uso local seguem sem rede. API e CLI chamam `initTracing()`; o CLI faz `flushTracing()` antes de sair, senão o lote pendente se perde.
+Dois destinos independentes:
+
+- **Banco local** (`traces.ts`, tabela `spans`), ligado por padrão (`TRACES_LOCAL=0` desliga). É o que alimenta a aba **Observabilidade**. A API grava tudo; no CLI, só `ask` e `council`, porque `eval` e ingestão gravariam centenas de traces de medição. Ficam os `MAX_TRACES` (500) mais recentes.
+- **Coletor OTLP** (Jaeger, Langfuse), quando `OTEL_EXPORTER_OTLP_ENDPOINT` existe. Recebe tudo, inclusive o `eval`.
+
+Sem `initTracing()` (nos testes) não há SDK registrado e a API do OTel é no-op. O CLI faz `flushTracing()` antes de fechar o banco, senão o lote pendente se perde ou é gravado num banco fechado.
+
+A aba Observabilidade lê `GET /api/traces` (resumo por trace: duração, modelo, tokens, custo somado dos `gen_ai.usage.cost`, citações inválidas, erros), `GET /api/traces/etapas` (p50/p95 e erros por nome de span) e `GET /api/traces/:id` (os spans de um trace, desenhados em cascata pela árvore de `parentId`, com o evento `primeiro_token` marcado). Custo por provedor vem de `/api/custos`. Na edição estática a aba só mostra um aviso: não há traces sem API.
 
 Os atributos `gen_ai.*` seguem as convenções semânticas de GenAI do OpenTelemetry, que o Langfuse reconhece como geração (modelo, tokens). Destinos testados pelo formato OTLP/HTTP:
 
@@ -166,9 +173,10 @@ Definido em `server/src/db.ts` e aplicado (idempotente) a cada abertura do banco
 | `chunks` | `id` (bigserial) | doc_id → documents (cascata), ord, heading, page_start, page_end, text, text_hash, tokens, embedding `vector(d)`, tsv (gerada) |
 | `graph_nodes` | `id` | type, label, data (jsonb, inclui visibilidade e códigos) |
 | `graph_edges` | (src, dst, type) | weight, evidence (jsonb: documento, visibilidade, detalhe) |
+| `spans` | (trace_id, span_id) | parent_id (null na raiz), name, start_ms, duration_ms, status (`ok`/`erro`), status_message, attributes (jsonb), events (jsonb). Mesmos atributos do OTLP, sem texto de trecho; só os 500 traces mais recentes |
 | `geracoes` | `id` (bigserial) | consulta, tipo (`resposta`/`conselho`), etapa (professor ou `sintese`), provedor, modelo, input_tokens, output_tokens, custo_usd (null sem preço), latencia_ms, criado_em. Só metadados, sem texto |
 
-Índices: GIN em `chunks.tsv`, HNSW (`vector_cosine_ops`) em `chunks.embedding` criado quando a dimensão é conhecida, B-tree em `chunks.doc_id`, `geracoes.consulta` e `geracoes.criado_em`.
+Índices: GIN em `chunks.tsv`, HNSW (`vector_cosine_ops`) em `chunks.embedding` criado quando a dimensão é conhecida, B-tree em `chunks.doc_id`, `geracoes.consulta` e `geracoes.criado_em`; parcial em `spans.start_ms` só para raízes (a lista de traces).
 
 `f_unaccent` é um invólucro `IMMUTABLE` de `unaccent`, necessário para usá-lo na coluna gerada.
 
@@ -176,7 +184,7 @@ A camada `Db` expõe `query`, `exec`, `transaction` e `close` com a mesma forma 
 
 ## Interface web
 
-`web/src/api.ts` tenta `GET api/health`; se falhar, entra em **modo demo** e lê `demo/*.json` (gerados por `npm run export`). No modo demo, Acervo, Grafo e Avaliação funcionam; Perguntar e Conselho não geram respostas. O build usa caminhos relativos (`base: "./"`), então o mesmo `web/dist` serve em localhost e no GitHub Pages.
+`web/src/api.ts` tenta `GET api/health`; se falhar, entra em **modo demo** e lê `demo/*.json` (gerados por `npm run export`). No modo demo, Acervo, Grafo e Avaliação funcionam; Perguntar e Conselho não geram respostas, e Observabilidade só avisa que precisa da API. O build usa caminhos relativos (`base: "./"`), então o mesmo `web/dist` serve em localhost e no GitHub Pages.
 
 ## Invariantes
 
