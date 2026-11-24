@@ -26,6 +26,9 @@ Três fontes de configuração, todas na raiz do repositório:
 | `PUBLIC_ONLY` | — | `1` força todas as rotas a responder só com documentos públicos. |
 | `LEXICAL_WEIGHT` | `0.5` | Peso da busca léxica no RRF. Ver [avaliacao.md](avaliacao.md). |
 | `RAG_URL` | `http://127.0.0.1:$PORT` | Endereço da API usado por `mcp.ts` e pela integração Python. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | — | Liga os spans por etapa (OTLP/HTTP). Sem ela, nada é exportado. Ver [arquitetura.md](arquitetura.md#rastreamento-tracets). |
+| `OTEL_EXPORTER_OTLP_HEADERS` | — | Cabeçalhos do exportador, como a autenticação do Langfuse (`Authorization=Basic <base64 de pk:sk>`). |
+| `OTEL_CAPTURE_CONTENT` | — | `1` inclui a pergunta e a resposta nos spans. Os trechos recuperados nunca entram. |
 
 ## `corpus.config.json`
 

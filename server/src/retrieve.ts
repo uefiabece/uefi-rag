@@ -2,6 +2,7 @@ import { settings } from "./config.js";
 import { getDb, toVector } from "./db.js";
 import { getEmbedder } from "./embed.js";
 import { prettyTitle } from "./ingest.js";
+import { withSpan, withSpanSync } from "./trace.js";
 
 export interface SearchFilters {
   repos?: string[];
@@ -75,19 +76,23 @@ const COLUMNS = `c.id, c.doc_id, d.repo, d.path, d.title, d.subject, d.section, 
                  c.heading, c.page_start, c.page_end, c.text`;
 
 async function vectorSearch(query: string, f: SearchFilters): Promise<Row[]> {
-  const [embedding] = await getEmbedder().embed([query]);
-  const params: unknown[] = [toVector(embedding!)];
-  const where = filterSql(f, params);
-  const db = await getDb();
-  const { rows } = await db.query<Row>(
-    `SELECT ${COLUMNS}, 1 - (c.embedding <=> $1::vector) AS similarity
-       FROM chunks c JOIN documents d ON d.id = c.doc_id
-      WHERE true ${where}
-      ORDER BY c.embedding <=> $1::vector
-      LIMIT ${CANDIDATES}`,
-    params,
-  );
-  return rows;
+  return withSpan("rag.busca.vetorial", { "rag.candidates.limit": CANDIDATES }, async (span) => {
+    const embedder = getEmbedder();
+    const [embedding] = await withSpan("rag.embedding", { "rag.embed.model": embedder.model }, () => embedder.embed([query]));
+    const params: unknown[] = [toVector(embedding!)];
+    const where = filterSql(f, params);
+    const db = await getDb();
+    const { rows } = await db.query<Row>(
+      `SELECT ${COLUMNS}, 1 - (c.embedding <=> $1::vector) AS similarity
+         FROM chunks c JOIN documents d ON d.id = c.doc_id
+        WHERE true ${where}
+        ORDER BY c.embedding <=> $1::vector
+        LIMIT ${CANDIDATES}`,
+      params,
+    );
+    span.setAttributes({ "rag.candidates": rows.length, "rag.similarity.top": Number(rows[0]?.similarity ?? 0) });
+    return rows;
+  });
 }
 
 /**
@@ -96,23 +101,26 @@ async function vectorSearch(query: string, f: SearchFilters): Promise<Row[]> {
  * quem casa mais termos e mais próximos.
  */
 async function lexicalSearch(query: string, f: SearchFilters): Promise<Row[]> {
-  const params: unknown[] = [query];
-  const where = filterSql(f, params);
-  const db = await getDb();
-  const { rows } = await db.query<Row>(
-    `WITH q AS (
-       SELECT nullif(replace(plainto_tsquery('portuguese', f_unaccent($1))::text, '&', '|'), '')::tsquery AS tsq,
-              tsvector_to_array(to_tsvector('portuguese', f_unaccent($1))) AS lexemes
-     )
-     SELECT ${COLUMNS},
-            (SELECT count(*) FROM unnest(q.lexemes) AS t(lex) WHERE c.tsv @@ quote_literal(t.lex)::tsquery) AS coverage
-       FROM chunks c JOIN documents d ON d.id = c.doc_id, q
-      WHERE q.tsq IS NOT NULL AND c.tsv @@ q.tsq ${where}
-      ORDER BY coverage DESC, ts_rank_cd(c.tsv, q.tsq, 32) DESC
-      LIMIT ${CANDIDATES}`,
-    params,
-  );
-  return rows;
+  return withSpan("rag.busca.lexica", { "rag.candidates.limit": CANDIDATES }, async (span) => {
+    const params: unknown[] = [query];
+    const where = filterSql(f, params);
+    const db = await getDb();
+    const { rows } = await db.query<Row>(
+      `WITH q AS (
+         SELECT nullif(replace(plainto_tsquery('portuguese', f_unaccent($1))::text, '&', '|'), '')::tsquery AS tsq,
+                tsvector_to_array(to_tsvector('portuguese', f_unaccent($1))) AS lexemes
+       )
+       SELECT ${COLUMNS},
+              (SELECT count(*) FROM unnest(q.lexemes) AS t(lex) WHERE c.tsv @@ quote_literal(t.lex)::tsquery) AS coverage
+         FROM chunks c JOIN documents d ON d.id = c.doc_id, q
+        WHERE q.tsq IS NOT NULL AND c.tsv @@ q.tsq ${where}
+        ORDER BY coverage DESC, ts_rank_cd(c.tsv, q.tsq, 32) DESC
+        LIMIT ${CANDIDATES}`,
+      params,
+    );
+    span.setAttribute("rag.candidates", rows.length);
+    return rows;
+  });
 }
 
 function toHit(row: Row): Omit<Hit, "score" | "vectorRank" | "lexicalRank" | "similarity"> {
@@ -158,19 +166,31 @@ export function fuse(vector: Row[], lexical: Row[], lexicalWeight = 1): Hit[] {
 
 export async function search(query: string, opts: SearchOptions = {}): Promise<Hit[]> {
   const { k = 8, mode = "hybrid", perDoc = 3, lexicalWeight = DEFAULT_LEXICAL_WEIGHT } = opts;
-  const [vector, lexical] = await Promise.all([
-    mode === "lexical" ? Promise.resolve([]) : vectorSearch(query, opts),
-    mode === "vector" ? Promise.resolve([]) : lexicalSearch(query, opts),
-  ]);
-  const ranked = fuse(vector, lexical, lexicalWeight);
-  const perDocCount = new Map<string, number>();
-  const out: Hit[] = [];
-  for (const hit of ranked) {
-    const n = perDocCount.get(hit.docId) ?? 0;
-    if (n >= perDoc) continue;
-    perDocCount.set(hit.docId, n + 1);
-    out.push(hit);
-    if (out.length >= k) break;
-  }
-  return out;
+  const publicOnly = !!(opts.publicOnly || settings.publicOnly);
+  return withSpan("rag.busca", { "rag.mode": mode, "rag.k": k, "rag.public_only": publicOnly }, async () => {
+    const [vector, lexical] = await Promise.all([
+      mode === "lexical" ? Promise.resolve([]) : vectorSearch(query, opts),
+      mode === "vector" ? Promise.resolve([]) : lexicalSearch(query, opts),
+    ]);
+    return withSpanSync("rag.rrf", { "rag.rrf.k": RRF_K, "rag.rrf.lexical_weight": lexicalWeight, "rag.per_doc": perDoc }, (span) => {
+      const ranked = fuse(vector, lexical, lexicalWeight);
+      const perDocCount = new Map<string, number>();
+      const out: Hit[] = [];
+      for (const hit of ranked) {
+        const n = perDocCount.get(hit.docId) ?? 0;
+        if (n >= perDoc) continue;
+        perDocCount.set(hit.docId, n + 1);
+        out.push(hit);
+        if (out.length >= k) break;
+      }
+      span.setAttributes({
+        "rag.rrf.fused": ranked.length,
+        "rag.hits": out.length,
+        "rag.hits.both_lists": out.filter((h) => h.vectorRank && h.lexicalRank).length,
+        // docId de repositório privado revela nome de arquivo com direitos autorais; só os públicos vão ao destino.
+        "rag.hits.docs": out.map((h) => (h.visibility === "publico" ? h.docId : "privado")),
+      });
+      return out;
+    });
+  });
 }

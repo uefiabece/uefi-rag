@@ -9,6 +9,7 @@ import { getDb } from "./db.js";
 import { getGenerator } from "./generate.js";
 import { loadGraph } from "./graph.js";
 import { search } from "./retrieve.js";
+import { flushTracing, initTracing } from "./trace.js";
 
 const app = Fastify({ logger: { level: "info" } });
 
@@ -206,11 +207,13 @@ app.post("/api/council", async (req, reply) => {
 
 const shutdown = async () => {
   await app.close();
+  await flushTracing();
   await (await getDb()).close();
   process.exit(0);
 };
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 
+await initTracing();
 await getDb();
 await app.listen({ host: "127.0.0.1", port: settings.port });

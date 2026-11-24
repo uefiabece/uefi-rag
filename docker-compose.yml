@@ -18,5 +18,13 @@ services:
       interval: 5s
       retries: 10
 
+  # Visualizador de traces, fora do `up` padrão: docker compose --profile traces up -d jaeger
+  jaeger:
+    image: jaegertracing/jaeger:latest
+    profiles: [traces]
+    ports:
+      - "127.0.0.1:16686:16686"
+      - "127.0.0.1:4318:4318"
+
 volumes:
   pgdata:

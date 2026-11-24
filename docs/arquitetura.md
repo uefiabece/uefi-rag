@@ -102,6 +102,33 @@ Interface `Generator.stream(system, messages, onText, signal)`. Implementações
 
 Embeddings (`embed.ts`): `ollama` (padrão `bge-m3`) ou `openai` (padrão `text-embedding-3-small`).
 
+## Rastreamento (`trace.ts`)
+
+Cada resposta vira um trace OpenTelemetry com um span por etapa:
+
+```
+rag.resposta                 k, retrieval_ms
+├─ rag.busca                 mode, k, public_only
+│  ├─ rag.busca.vetorial     candidates, similarity.top
+│  │  └─ rag.embedding       embed.model
+│  ├─ rag.busca.lexica       candidates
+│  └─ rag.rrf                rrf.k, lexical_weight, fused, hits, hits.both_lists, hits.docs
+├─ rag.grafo                 graph.found, graph.chars
+├─ rag.geracao               gen_ai.system, gen_ai.request.model, gen_ai.usage.*, evento primeiro_token
+└─ rag.citacoes              citations.valid, citations.invalid
+```
+
+Fica desligado até `OTEL_EXPORTER_OTLP_ENDPOINT` existir: sem SDK registrado, a API do OTel é no-op, e os testes e o uso local seguem sem rede. API e CLI chamam `initTracing()`; o CLI faz `flushTracing()` antes de sair, senão o lote pendente se perde.
+
+Os atributos `gen_ai.*` seguem as convenções semânticas de GenAI do OpenTelemetry, que o Langfuse reconhece como geração (modelo, tokens). Destinos testados pelo formato OTLP/HTTP:
+
+| Destino | Configuração |
+|---|---|
+| Jaeger local | `docker compose --profile traces up -d jaeger`; `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318`; interface em `http://127.0.0.1:16686` |
+| Langfuse | `OTEL_EXPORTER_OTLP_ENDPOINT=https://cloud.langfuse.com/api/public/otel` e `OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic <base64 de pk:sk>` |
+
+Privacidade: o destino é um serviço à parte. O texto dos trechos nunca entra nos spans, e `hits.docs` troca o `docId` de documento privado por `"privado"`, porque o nome do arquivo já identifica material com direitos autorais. Pergunta e resposta só entram com `OTEL_CAPTURE_CONTENT=1`, já que a resposta pode citar trechos privados.
+
 ## Modelo de dados
 
 Definido em `server/src/db.ts` e aplicado (idempotente) a cada abertura do banco.
@@ -126,7 +153,7 @@ A camada `Db` expõe `query`, `exec`, `transaction` e `close` com a mesma forma 
 
 ## Invariantes
 
-1. Nenhum conteúdo de repositório `privado` sai do ambiente local: `export.ts` filtra por `visibility = 'publico'` e só grava o relatório de avaliação se todos os itens forem públicos; resultados privados vão para `eval/resultados/privado/` (no `.gitignore`).
+1. Nenhum conteúdo de repositório `privado` sai do ambiente local: `export.ts` filtra por `visibility = 'publico'` e só grava o relatório de avaliação se todos os itens forem públicos; resultados privados vão para `eval/resultados/privado/` (no `.gitignore`). Spans exportados não levam texto de trechos nem `docId` privado.
 2. Um índice, um espaço vetorial: `ensureEmbeddingSpace` recusa abrir com modelo ou dimensão diferentes dos gravados em `meta`.
 3. Um processo por banco PGlite.
 4. Toda citação exibida é verificável: o número aponta para uma fonte enviada no mesmo stream, ou é marcado como inválido.

@@ -1,5 +1,6 @@
 import { parseArgs } from "node:util";
 import { getDb } from "./db.js";
+import { flushTracing, initTracing } from "./trace.js";
 
 const [command, ...rest] = process.argv.slice(2);
 
@@ -133,9 +134,11 @@ async function main() {
   }
 }
 
-main()
+initTracing()
+  .then(main)
   .then(async () => (await getDb()).close())
   .catch(async (err) => {
     console.error(err instanceof Error ? err.message : err);
     process.exitCode = 1;
-  });
+  })
+  .finally(flushTracing);

@@ -47,5 +47,9 @@ export const settings = {
   // Qualquer servidor compatível com a API da OpenAI (OpenRouter, Groq, o /v1 do Ollama…) serve aqui.
   openaiUrl: (process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1").replace(/\/+$/, ""),
   port: Number(process.env.PORT ?? 8787),
+  tracing: {
+    endpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    captureContent: process.env.OTEL_CAPTURE_CONTENT === "1",
+  },
   publicOnly: process.env.PUBLIC_ONLY === "1",
 };

@@ -39,6 +39,7 @@ Antes de terminar uma mudança: `npm test` e `npm run typecheck`.
 - **Schema sem migrações versionadas.** `db.ts` roda `CREATE ... IF NOT EXISTS` a cada abertura. Mudança de coluna em tabela existente não é aplicada sozinha: inclua o `ALTER` idempotente no `SCHEMA` ou documente que é preciso `--reset`.
 - **Citações `[n]` são contrato.** O servidor valida com `parseCitations` (aceita `[1][3]`, `[1, 3]`, `[2–4]`); a interface marca em vermelho números inválidos. No conselho, `[geral]` marca conhecimento fora do acervo e é contado por `countGeneral`. Ao mexer em prompts (`SYSTEM_PROMPT`, `professorPrompt`, `SYNTHESIS_PROMPT`) preserve esses formatos e rode `npm run eval`.
 - **Mudanças na busca se medem.** Peso léxico, `RRF_K`, `CANDIDATES`, `perDoc`, chunking: rode `npm run eval -- --no-answers` antes e depois e registre o efeito em `docs/avaliacao.md`. Não ajuste parâmetros olhando só o conjunto que os mede.
+- **Spans não levam conteúdo do acervo.** O destino do OpenTelemetry (Langfuse, Jaeger) é externo: nunca ponha texto de trecho num atributo, troque `docId` privado por `"privado"` e passe pergunta/resposta só por `contentAttributes` (opt-in com `OTEL_CAPTURE_CONTENT=1`).
 - **`conselho.config.json` só pode citar repositórios declarados em `repos` de `corpus.config.json`** — há teste para isso, e ele não enxerga os descobertos por `discover` (o teste não lê `uefiRoot`). Um `uefi-uefimcp-*` privado entra no acervo sem editar nada; para ligá-lo a um professor, declare-o em `repos` e cite-o no conselho, sem código.
 - **Contrato SSE.** Eventos de `/api/ask` (`sources`, `delta`, `done`, `error`) e de `/api/council` (`professores`, `sources`, `delta`, `perspectiva`, `done`, `error`) são consumidos por `web/src/api.ts`. Mudou um lado, mude o outro. Tipos do servidor e do cliente são duplicados à mão (não há pacote compartilhado).
 - **Grafo é por regras, sem LLM.** Os parsers em `graph.ts` são testados contra exemplos reais em `server/test/core.test.ts`; ao ajustar um parser, acrescente o caso que motivou a mudança.
@@ -66,4 +67,5 @@ Antes de terminar uma mudança: `npm test` e `npm run typecheck`.
 | Provedores de LLM | `generate.ts`, `embed.ts` |
 | Rotas HTTP | `api.ts` |
 | Ferramentas MCP | `mcp.ts` |
+| Spans por etapa (OpenTelemetry) | `trace.ts`; spans em `retrieve.ts` e `answer.ts` |
 | Cliente web e modo demo | `web/src/api.ts` |

@@ -1,6 +1,7 @@
-import { getGenerator, type ChatTurn, type Generator } from "./generate.js";
+import { getGenerator, type ChatTurn, type GenerationResult, type Generator } from "./generate.js";
 import { graphContext } from "./graph.js";
 import { search, type Hit, type SearchFilters } from "./retrieve.js";
+import { contentAttributes, withSpan, withSpanSync } from "./trace.js";
 
 export const SECTION_LABEL: Record<string, string> = {
   syllabus: "ementa / plano de ensino",
@@ -144,31 +145,80 @@ export async function answer(
   generator: Generator = getGenerator(),
   k = 8,
 ): Promise<AnswerResult> {
-  const started = Date.now();
-  const query = retrievalQuery(question, history);
-  const [hits, graph] = await Promise.all([search(query, { ...filters, k }), graphContext(query, filters)]);
-  const sources = toSources(hits, graph);
-  const retrievalMs = Date.now() - started;
-  cb.onSources?.(sources);
+  const rootAttrs = { "rag.k": k, "rag.history_turns": history.length, ...contentAttributes({ "rag.question": question }) };
+  return withSpan("rag.resposta", rootAttrs, async (root) => {
+    const started = Date.now();
+    const query = retrievalQuery(question, history);
+    const [hits, graph] = await Promise.all([
+      search(query, { ...filters, k }),
+      withSpan("rag.grafo", {}, async (span) => {
+        const g = await graphContext(query, filters);
+        span.setAttributes({ "rag.graph.found": !!g, "rag.graph.chars": g?.length ?? 0 });
+        return g;
+      }),
+    ]);
+    const sources = toSources(hits, graph);
+    const retrievalMs = Date.now() - started;
+    cb.onSources?.(sources);
 
-  const user = `<fontes>\n${renderSources(sources)}\n</fontes>\n\n<pergunta>\n${question}\n</pergunta>`;
-  const messages: ChatTurn[] = [...history.slice(-6), { role: "user", content: user }];
-  const result = await generator.stream(SYSTEM_PROMPT, messages, (d) => cb.onText?.(d), cb.signal);
+    const user = `<fontes>\n${renderSources(sources)}\n</fontes>\n\n<pergunta>\n${question}\n</pergunta>`;
+    const messages: ChatTurn[] = [...history.slice(-6), { role: "user", content: user }];
+    const result = await traceGeneration(
+      generator,
+      "rag.geracao",
+      (onText) => generator.stream(SYSTEM_PROMPT, messages, onText, cb.signal),
+      (d) => cb.onText?.(d),
+    );
 
-  let text = result.text;
-  if (result.stopReason === "refusal" && !text.trim()) {
-    text = "O modelo recusou esta pergunta. Tente reformulá-la.";
-    cb.onText?.(text);
-  }
-  return {
-    text,
-    sources,
-    citations: parseCitations(text, sources.length),
-    model: result.model,
-    provider: generator.provider,
-    stopReason: result.stopReason,
-    usage: result.usage,
-    latencyMs: Date.now() - started,
-    retrievalMs,
-  };
+    let text = result.text;
+    if (result.stopReason === "refusal" && !text.trim()) {
+      text = "O modelo recusou esta pergunta. Tente reformulá-la.";
+      cb.onText?.(text);
+    }
+    const citations = withSpanSync("rag.citacoes", { "rag.sources": sources.length }, (span) => {
+      const c = parseCitations(text, sources.length);
+      span.setAttributes({ "rag.citations.valid": c.valid.length, "rag.citations.invalid": c.invalid.length });
+      return c;
+    });
+    root.setAttributes({ "rag.retrieval_ms": retrievalMs, ...contentAttributes({ "rag.answer": text }) });
+    return {
+      text,
+      sources,
+      citations,
+      model: result.model,
+      provider: generator.provider,
+      stopReason: result.stopReason,
+      usage: result.usage,
+      latencyMs: Date.now() - started,
+      retrievalMs,
+    };
+  });
+}
+
+/**
+ * Span de uma chamada ao gerador com as convenções gen_ai.* do OpenTelemetry, que o Langfuse reconhece
+ * como geração (modelo, tokens). O evento do primeiro token separa a espera pelo provedor do tempo de escrita.
+ */
+export function traceGeneration(
+  generator: Generator,
+  name: string,
+  call: (onText: (delta: string) => void) => Promise<GenerationResult>,
+  onText: (delta: string) => void,
+  attributes: Record<string, string | number> = {},
+): Promise<GenerationResult> {
+  const attrs = { "gen_ai.system": generator.provider, "gen_ai.request.model": generator.model, ...attributes };
+  return withSpan(name, attrs, async (span) => {
+    let first = true;
+    const result = await call((d) => {
+      if (first) span.addEvent("primeiro_token");
+      first = false;
+      onText(d);
+    });
+    span.setAttributes({
+      "gen_ai.response.model": result.model,
+      ...(result.stopReason && { "gen_ai.response.finish_reasons": [result.stopReason] }),
+      ...(result.usage && { "gen_ai.usage.input_tokens": result.usage.inputTokens, "gen_ai.usage.output_tokens": result.usage.outputTokens }),
+    });
+    return result;
+  });
 }
