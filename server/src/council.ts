@@ -5,11 +5,13 @@
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { parseCitations, renderSources, toSources, type Source } from "./answer.js";
+import { parseCitations, renderSources, toSources, traceGeneration, type Source } from "./answer.js";
 import { ROOT, settings } from "./config.js";
 import { getDb } from "./db.js";
+import type { Span } from "@opentelemetry/api";
 import { getGenerator, type Generator } from "./generate.js";
 import { search } from "./retrieve.js";
+import { contentAttributes, withSpan, withSpanSync } from "./trace.js";
 
 export interface Professor {
   id: string;
@@ -131,10 +133,28 @@ export interface CouncilOptions {
 export const SYNTHESIS_ID = "sintese";
 
 export async function convene(question: string, opts: CouncilOptions) {
-  const started = Date.now();
   const generator = opts.generator ?? getGenerator();
   const professors = selectProfessors(loadCouncil(), opts.professors);
   const k = opts.k ?? 5;
+  const rootAttrs = {
+    "rag.council.professors": professors.map((p) => p.id),
+    "rag.k": k,
+    "rag.public_only": !!(opts.publicOnly || settings.publicOnly),
+    ...contentAttributes({ "rag.question": question }),
+  };
+  // Um trace por conselho: um ramo por professor, todos em paralelo, e a síntese no fim.
+  return withSpan("rag.conselho", rootAttrs, (root) => runCouncil(question, opts, generator, professors, k, root));
+}
+
+async function runCouncil(
+  question: string,
+  opts: CouncilOptions,
+  generator: Generator,
+  professors: Professor[],
+  k: number,
+  root: Span,
+) {
+  const started = Date.now();
   let inputTokens = 0;
   let outputTokens = 0;
   opts.onEvent({ type: "professores", professores: professors.map(({ id, area, titulo }) => ({ id, area, titulo })) });
@@ -143,34 +163,47 @@ export async function convene(question: string, opts: CouncilOptions) {
   const results = await Promise.all(
     professors.map(async (prof) => {
       const t0 = Date.now();
+      const branchAttrs = { "rag.professor.id": prof.id, "rag.professor.area": prof.area, "rag.professor.repos": prof.repos.length };
       try {
-        const hits = prof.repos.length
-          ? await search(question, { repos: prof.repos, k, perDoc: 2, publicOnly: opts.publicOnly })
-          : [];
-        const sources = toSources(hits, null);
-        opts.onEvent({ type: "sources", professor: prof.id, sources });
-        const user = `${sources.length ? `<fontes>\n${renderSources(sources)}\n</fontes>\n\n` : ""}<pergunta>\n${question}\n</pergunta>`;
-        const r = await generator.stream(
-          professorPrompt(prof, professors, sources.length > 0),
-          [{ role: "user", content: user }],
-          (text) => opts.onEvent({ type: "delta", professor: prof.id, text }),
-          opts.signal,
-        );
-        inputTokens += r.usage?.inputTokens ?? 0;
-        outputTokens += r.usage?.outputTokens ?? 0;
-        const citations = parseCitations(r.text, sources.length);
-        const general = countGeneral(r.text);
-        opts.onEvent({
-          type: "perspectiva",
-          professor: prof.id,
-          citations,
-          general,
-          grounded: sources.length > 0,
-          model: r.model,
-          latencyMs: Date.now() - t0,
-          outputTokens: r.usage?.outputTokens ?? null,
+        // withSpan marca o ramo como erro e relança; o catch abaixo mantém o conselho de pé sem esse professor.
+        return await withSpan("rag.conselho.professor", branchAttrs, async (span) => {
+          const hits = prof.repos.length
+            ? await search(question, { repos: prof.repos, k, perDoc: 2, publicOnly: opts.publicOnly })
+            : [];
+          const sources = toSources(hits, null);
+          opts.onEvent({ type: "sources", professor: prof.id, sources });
+          const user = `${sources.length ? `<fontes>\n${renderSources(sources)}\n</fontes>\n\n` : ""}<pergunta>\n${question}\n</pergunta>`;
+          const r = await traceGeneration(
+            generator,
+            "rag.geracao",
+            (onText) => generator.stream(professorPrompt(prof, professors, sources.length > 0), [{ role: "user", content: user }], onText, opts.signal),
+            (text) => opts.onEvent({ type: "delta", professor: prof.id, text }),
+            { "rag.professor.id": prof.id },
+          );
+          inputTokens += r.usage?.inputTokens ?? 0;
+          outputTokens += r.usage?.outputTokens ?? 0;
+          const { citations, general } = withSpanSync("rag.citacoes", { "rag.sources": sources.length }, (s) => {
+            const c = { citations: parseCitations(r.text, sources.length), general: countGeneral(r.text) };
+            s.setAttributes({
+              "rag.citations.valid": c.citations.valid.length,
+              "rag.citations.invalid": c.citations.invalid.length,
+              "rag.citations.general": c.general,
+            });
+            return c;
+          });
+          span.setAttribute("rag.professor.grounded", sources.length > 0);
+          opts.onEvent({
+            type: "perspectiva",
+            professor: prof.id,
+            citations,
+            general,
+            grounded: sources.length > 0,
+            model: r.model,
+            latencyMs: Date.now() - t0,
+            outputTokens: r.usage?.outputTokens ?? null,
+          });
+          return { prof, text: r.text, cited: citations.valid.length, general, grounded: sources.length > 0 };
         });
-        return { prof, text: r.text, cited: citations.valid.length, general, grounded: sources.length > 0 };
       } catch (err) {
         if (opts.signal?.aborted) throw err;
         const message = err instanceof Error ? err.message : String(err);
@@ -194,11 +227,19 @@ export async function convene(question: string, opts: CouncilOptions) {
   if (ok.length >= 2) {
     const t0 = Date.now();
     try {
-      const r = await generator.stream(
-        SYNTHESIS_PROMPT,
-        [{ role: "user", content: `<pergunta>\n${question}\n</pergunta>\n\n${renderPerspectives(ok)}` }],
-        (text) => opts.onEvent({ type: "delta", professor: SYNTHESIS_ID, text }),
-        opts.signal,
+      const r = await withSpan("rag.conselho.sintese", { "rag.council.perspectives": ok.length }, () =>
+        traceGeneration(
+          generator,
+          "rag.geracao",
+          (onText) =>
+            generator.stream(
+              SYNTHESIS_PROMPT,
+              [{ role: "user", content: `<pergunta>\n${question}\n</pergunta>\n\n${renderPerspectives(ok)}` }],
+              onText,
+              opts.signal,
+            ),
+          (text) => opts.onEvent({ type: "delta", professor: SYNTHESIS_ID, text }),
+        ),
       );
       inputTokens += r.usage?.inputTokens ?? 0;
       outputTokens += r.usage?.outputTokens ?? 0;
@@ -227,5 +268,11 @@ export async function convene(question: string, opts: CouncilOptions) {
       });
     }
   }
+  root.setAttributes({
+    "rag.council.perspectives": ok.length,
+    "rag.council.failed": results.filter((r) => r === null).length,
+    "gen_ai.usage.input_tokens": inputTokens,
+    "gen_ai.usage.output_tokens": outputTokens,
+  });
   opts.onEvent({ type: "done", latencyMs: Date.now() - started, inputTokens, outputTokens });
 }

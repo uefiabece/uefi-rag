@@ -118,6 +118,21 @@ rag.resposta                 k, retrieval_ms
 └─ rag.citacoes              citations.valid, citations.invalid
 ```
 
+O conselho é um trace só, com um ramo por professor. Os ramos começam juntos e se sobrepõem na linha do tempo, e a síntese só começa quando o último termina:
+
+```
+rag.conselho                 council.professors, perspectives, failed, gen_ai.usage.*
+├─ rag.conselho.professor    professor.id, professor.area, professor.grounded   ┐
+│  ├─ rag.busca …            (só se o professor tem repositórios)               │ em paralelo
+│  ├─ rag.geracao            gen_ai.*, professor.id                             │
+│  └─ rag.citacoes           citations.valid, invalid, general ([geral])        │
+├─ rag.conselho.professor …                                                     ┘
+└─ rag.conselho.sintese      council.perspectives
+   └─ rag.geracao
+```
+
+Professor que falha marca o próprio ramo como erro e o conselho segue sem ele, como no fluxo sem tracing.
+
 Fica desligado até `OTEL_EXPORTER_OTLP_ENDPOINT` existir: sem SDK registrado, a API do OTel é no-op, e os testes e o uso local seguem sem rede. API e CLI chamam `initTracing()`; o CLI faz `flushTracing()` antes de sair, senão o lote pendente se perde.
 
 Os atributos `gen_ai.*` seguem as convenções semânticas de GenAI do OpenTelemetry, que o Langfuse reconhece como geração (modelo, tokens). Destinos testados pelo formato OTLP/HTTP:

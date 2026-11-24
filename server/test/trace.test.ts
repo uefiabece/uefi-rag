@@ -2,6 +2,7 @@ import { trace } from "@opentelemetry/api";
 import { InMemorySpanExporter, NodeTracerProvider, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { traceGeneration } from "../src/answer.js";
+import { convene } from "../src/council.js";
 import type { Generator } from "../src/generate.js";
 import { withSpan } from "../src/trace.js";
 
@@ -52,5 +53,40 @@ describe("spans", () => {
     expect(busca.spanContext().traceId).toBe(resposta.spanContext().traceId);
     expect(busca.parentSpanContext?.spanId).toBe(resposta.spanContext().spanId);
     expect(busca.status.message).toBe("banco fora");
+  });
+
+  it("conselho vira um trace só: um ramo por professor em paralelo e a síntese depois", async () => {
+    // Professores sem repositório não tocam o banco; o atraso deixa os ramos visivelmente sobrepostos.
+    const slow: Generator = {
+      provider: "ollama",
+      model: "falso",
+      async stream(system, _messages, onText) {
+        await new Promise((r) => setTimeout(r, 20));
+        if (system.includes("professor de História")) throw new Error("caiu");
+        const text = system.startsWith("Você media") ? "Convergem." : "Ponto [geral].";
+        onText(text);
+        return { text, model: "falso", stopReason: "stop", usage: { inputTokens: 10, outputTokens: 5 } };
+      },
+    };
+    await convene("Pergunta", { professors: ["computacao", "economia", "historia"], generator: slow, onEvent: () => {} });
+    const spans = exporter.getFinishedSpans();
+    const root = spans.find((s) => s.name === "rag.conselho")!;
+    const childrenOf = (id: string) => spans.filter((s) => s.parentSpanContext?.spanId === id);
+    const branches = childrenOf(root.spanContext().spanId).filter((s) => s.name === "rag.conselho.professor");
+
+    expect(new Set(spans.map((s) => s.spanContext().traceId)).size).toBe(1);
+    expect(branches.map((b) => b.attributes["rag.professor.id"]).sort()).toEqual(["computacao", "economia", "historia"]);
+    for (const b of branches) expect(childrenOf(b.spanContext().spanId).map((s) => s.name)).toContain("rag.geracao");
+    const t = (hr: [number, number]) => hr[0] * 1e3 + hr[1] / 1e6;
+    const lastStart = Math.max(...branches.map((b) => t(b.startTime)));
+    const firstEnd = Math.min(...branches.map((b) => t(b.endTime)));
+    expect(lastStart).toBeLessThan(firstEnd);
+
+    // O professor que falhou fica marcado no próprio ramo; o conselho segue e sintetiza com os outros dois.
+    const historia = branches.find((b) => b.attributes["rag.professor.id"] === "historia")!;
+    expect(historia.status.message).toBe("caiu");
+    const sintese = childrenOf(root.spanContext().spanId).find((s) => s.name === "rag.conselho.sintese")!;
+    expect(t(sintese.startTime)).toBeGreaterThanOrEqual(Math.max(...branches.map((b) => t(b.endTime))));
+    expect(root.attributes).toMatchObject({ "rag.council.perspectives": 2, "rag.council.failed": 1, "gen_ai.usage.input_tokens": 30 });
   });
 });

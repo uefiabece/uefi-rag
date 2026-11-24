@@ -67,5 +67,5 @@ Antes de terminar uma mudança: `npm test` e `npm run typecheck`.
 | Provedores de LLM | `generate.ts`, `embed.ts` |
 | Rotas HTTP | `api.ts` |
 | Ferramentas MCP | `mcp.ts` |
-| Spans por etapa (OpenTelemetry) | `trace.ts`; spans em `retrieve.ts` e `answer.ts` |
+| Spans por etapa (OpenTelemetry) | `trace.ts`; spans em `retrieve.ts`, `answer.ts` e `council.ts` |
 | Cliente web e modo demo | `web/src/api.ts` |
