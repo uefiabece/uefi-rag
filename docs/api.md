@@ -80,7 +80,7 @@ interface Hit {
 |---|---|---|
 | `sources` | `Source[]` | uma vez, antes do primeiro token |
 | `delta` | `{ text }` | a cada pedaço gerado |
-| `done` | `{ citations: { valid, invalid }, model, provider, stopReason, usage, latencyMs, retrievalMs }` | fim normal |
+| `done` | `{ citations: { valid, invalid }, model, provider, stopReason, usage, latencyMs, retrievalMs, costUsd }` | fim normal; `costUsd` é `null` quando o modelo não tem preço |
 | `error` | `{ message }` | falha depois de iniciado o stream |
 
 ```ts
@@ -112,9 +112,13 @@ Fechar a conexão cancela a geração.
 | `professores` | `{ professores: [{ id, area, titulo }] }` — primeiro evento |
 | `sources` | `{ professor, sources: Source[] }` — um por professor |
 | `delta` | `{ professor, text }` — intercalados entre professores; `professor = "sintese"` para a síntese |
-| `perspectiva` | `{ professor, citations, general, grounded, model, latencyMs, outputTokens, error? }` — fim de cada professor e da síntese |
-| `done` | `{ latencyMs, inputTokens, outputTokens }` |
+| `perspectiva` | `{ professor, citations, general, grounded, model, latencyMs, outputTokens, costUsd, error? }` — fim de cada professor e da síntese |
+| `done` | `{ latencyMs, inputTokens, outputTokens, costUsd }` — `costUsd` soma as chamadas que deram certo; `null` se alguma não tem preço |
 | `error` | `{ message }` |
+
+### `GET /api/custos?limit=20`
+
+Custo agregado das consultas registradas (tabela `geracoes`): `{ moeda, desde, porProvedor[], porTipo[], ultimas[] }`. `porProvedor` agrupa por provedor e modelo, com consultas, chamadas, tokens, `custoUsd` e `semPreco` (chamadas sem preço; com alguma, `custoUsd` do grupo é `null`). `porTipo` dá média e total por `resposta`/`conselho`. Só metadados: nenhuma pergunta, resposta ou trecho é gravado.
 
 ## Servidor MCP
 
@@ -140,6 +144,7 @@ Registro no Claude Desktop/Code: veja [integrations/python/README.md](../integra
 | `search <consulta>` | `--k`, `--mode`, `--repo a,b`, `--section a,b`, `--public` |
 | `ask <pergunta>` | `--repo`, `--section`, `--public` |
 | `council <pergunta>` | `--prof a,b,c`, `--public` |
+| `custos` | `--limit N` (últimas consultas, padrão 10) |
 | `eval` | `--set publico\|privado\|todos`, `--limit N`, `--no-answers`, `--label X` |
 | `export` | — |
 

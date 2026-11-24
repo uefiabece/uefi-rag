@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { convene, getCouncil, isDemo, SECTION_LABEL, type CouncilInfo, type PerspectiveInfo, type Source } from "../api";
+import { convene, formatUsd, getCouncil, isDemo, SECTION_LABEL, type CouncilDone, type CouncilInfo, type PerspectiveInfo, type Source } from "../api";
 import { Markdown } from "../components/Markdown";
 
 const SYNTHESIS = "sintese";
@@ -21,7 +21,7 @@ interface Session {
   question: string;
   ids: string[];
   columns: Record<string, Column>;
-  done: { latencyMs: number; inputTokens: number; outputTokens: number } | null;
+  done: CouncilDone | null;
   error: string | null;
   running: boolean;
 }
@@ -223,6 +223,7 @@ Lente: ${p.lente}`}
                           <span>nenhuma fonte do acervo</span>
                         )}
                         {info.citations.invalid.length > 0 && <span className="tag inverted">citação sem fonte: {info.citations.invalid.join(", ")}</span>}
+                        {info.costUsd !== undefined && <span>{formatUsd(info.costUsd)}</span>}
                       </>
                     )}
                   </div>
@@ -278,6 +279,7 @@ Lente: ${p.lente}`}
             <p className="small italic muted" style={{ textAlign: "center", marginTop: 20 }}>
               {(session.done.latencyMs / 1000).toFixed(1).replace(".", ",")} s ·{" "}
               {(session.done.inputTokens + session.done.outputTokens).toLocaleString("pt-BR")} tokens · {session.ids.length + 1} chamadas ao modelo
+              {session.done.costUsd !== undefined && ` · ${formatUsd(session.done.costUsd)}`}
             </p>
           )}
         </>

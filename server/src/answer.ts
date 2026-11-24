@@ -1,3 +1,4 @@
+import { costUsd } from "./cost.js";
 import { getGenerator, type ChatTurn, type GenerationResult, type Generator } from "./generate.js";
 import { graphContext } from "./graph.js";
 import { search, type Hit, type SearchFilters } from "./retrieve.js";
@@ -39,6 +40,8 @@ export interface AnswerResult {
   usage: { inputTokens: number; outputTokens: number } | null;
   latencyMs: number;
   retrievalMs: number;
+  /** Custo da geração em USD; null quando o modelo não tem preço em precos.config.json. */
+  costUsd: number | null;
 }
 
 export interface AnswerCallbacks {
@@ -180,7 +183,11 @@ export async function answer(
       span.setAttributes({ "rag.citations.valid": c.valid.length, "rag.citations.invalid": c.invalid.length });
       return c;
     });
-    root.setAttributes({ "rag.retrieval_ms": retrievalMs, ...contentAttributes({ "rag.answer": text }) });
+    root.setAttributes({
+      "rag.retrieval_ms": retrievalMs,
+      ...(result.costUsd !== null && { "gen_ai.usage.cost": result.costUsd }),
+      ...contentAttributes({ "rag.answer": text }),
+    });
     return {
       text,
       sources,
@@ -191,13 +198,15 @@ export async function answer(
       usage: result.usage,
       latencyMs: Date.now() - started,
       retrievalMs,
+      costUsd: result.costUsd,
     };
   });
 }
 
 /**
  * Span de uma chamada ao gerador com as convenções gen_ai.* do OpenTelemetry, que o Langfuse reconhece
- * como geração (modelo, tokens). O evento do primeiro token separa a espera pelo provedor do tempo de escrita.
+ * como geração (modelo, tokens, custo). O evento do primeiro token separa a espera pelo provedor do tempo de escrita.
+ * O custo usa o modelo que respondeu, não o pedido: o fallback da Anthropic pode trocar de modelo no meio.
  */
 export function traceGeneration(
   generator: Generator,
@@ -205,10 +214,11 @@ export function traceGeneration(
   call: (onText: (delta: string) => void) => Promise<GenerationResult>,
   onText: (delta: string) => void,
   attributes: Record<string, string | number> = {},
-): Promise<GenerationResult> {
+): Promise<GenerationResult & { costUsd: number | null; latencyMs: number }> {
   const attrs = { "gen_ai.system": generator.provider, "gen_ai.request.model": generator.model, ...attributes };
   return withSpan(name, attrs, async (span) => {
     let first = true;
+    const t0 = Date.now();
     const result = await call((d) => {
       if (first) span.addEvent("primeiro_token");
       first = false;
@@ -219,6 +229,8 @@ export function traceGeneration(
       ...(result.stopReason && { "gen_ai.response.finish_reasons": [result.stopReason] }),
       ...(result.usage && { "gen_ai.usage.input_tokens": result.usage.inputTokens, "gen_ai.usage.output_tokens": result.usage.outputTokens }),
     });
-    return result;
+    const cost = costUsd(generator.provider, result.model, result.usage);
+    if (cost !== null) span.setAttribute("gen_ai.usage.cost", cost);
+    return { ...result, costUsd: cost, latencyMs: Date.now() - t0 };
   });
 }

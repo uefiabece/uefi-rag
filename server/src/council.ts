@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parseCitations, renderSources, toSources, traceGeneration, type Source } from "./answer.js";
 import { ROOT, settings } from "./config.js";
+import { sumCost, type GenerationRecord } from "./cost.js";
 import { getDb } from "./db.js";
 import type { Span } from "@opentelemetry/api";
 import { getGenerator, type Generator } from "./generate.js";
@@ -117,9 +118,11 @@ export type CouncilEvent =
       model: string | null;
       latencyMs: number;
       outputTokens: number | null;
+      /** USD; null sem preço conhecido para o modelo, ou quando a chamada falhou. */
+      costUsd: number | null;
       error?: string;
     }
-  | { type: "done"; latencyMs: number; inputTokens: number; outputTokens: number };
+  | { type: "done"; latencyMs: number; inputTokens: number; outputTokens: number; costUsd: number | null };
 
 export interface CouncilOptions {
   professors?: string[];
@@ -132,7 +135,8 @@ export interface CouncilOptions {
 
 export const SYNTHESIS_ID = "sintese";
 
-export async function convene(question: string, opts: CouncilOptions) {
+/** Devolve as chamadas feitas ao gerador, para quem chamou registrar o custo (veja recordQuery). */
+export async function convene(question: string, opts: CouncilOptions): Promise<GenerationRecord[]> {
   const generator = opts.generator ?? getGenerator();
   const professors = selectProfessors(loadCouncil(), opts.professors);
   const k = opts.k ?? 5;
@@ -157,6 +161,7 @@ async function runCouncil(
   const started = Date.now();
   let inputTokens = 0;
   let outputTokens = 0;
+  const calls: GenerationRecord[] = [];
   opts.onEvent({ type: "professores", professores: professors.map(({ id, area, titulo }) => ({ id, area, titulo })) });
 
   // Cada professor busca só no acervo da própria área; as perspectivas rodam em paralelo.
@@ -182,6 +187,7 @@ async function runCouncil(
           );
           inputTokens += r.usage?.inputTokens ?? 0;
           outputTokens += r.usage?.outputTokens ?? 0;
+          calls.push({ etapa: prof.id, provider: generator.provider, model: r.model, usage: r.usage, costUsd: r.costUsd, latencyMs: r.latencyMs });
           const { citations, general } = withSpanSync("rag.citacoes", { "rag.sources": sources.length }, (s) => {
             const c = { citations: parseCitations(r.text, sources.length), general: countGeneral(r.text) };
             s.setAttributes({
@@ -201,6 +207,7 @@ async function runCouncil(
             model: r.model,
             latencyMs: Date.now() - t0,
             outputTokens: r.usage?.outputTokens ?? null,
+            costUsd: r.costUsd,
           });
           return { prof, text: r.text, cited: citations.valid.length, general, grounded: sources.length > 0 };
         });
@@ -216,6 +223,7 @@ async function runCouncil(
           model: null,
           latencyMs: Date.now() - t0,
           outputTokens: null,
+          costUsd: null,
           error: message,
         });
         return null;
@@ -243,6 +251,7 @@ async function runCouncil(
       );
       inputTokens += r.usage?.inputTokens ?? 0;
       outputTokens += r.usage?.outputTokens ?? 0;
+      calls.push({ etapa: SYNTHESIS_ID, provider: generator.provider, model: r.model, usage: r.usage, costUsd: r.costUsd, latencyMs: r.latencyMs });
       opts.onEvent({
         type: "perspectiva",
         professor: SYNTHESIS_ID,
@@ -252,6 +261,7 @@ async function runCouncil(
         model: r.model,
         latencyMs: Date.now() - t0,
         outputTokens: r.usage?.outputTokens ?? null,
+        costUsd: r.costUsd,
       });
     } catch (err) {
       if (opts.signal?.aborted) throw err;
@@ -264,15 +274,20 @@ async function runCouncil(
         model: null,
         latencyMs: Date.now() - t0,
         outputTokens: null,
+        costUsd: null,
         error: err instanceof Error ? err.message : String(err),
       });
     }
   }
+  // Chamada que falhou não entra: não devolveu uso, e o provedor em geral não cobra o erro.
+  const costUsd = sumCost(calls.map((c) => c.costUsd));
   root.setAttributes({
     "rag.council.perspectives": ok.length,
     "rag.council.failed": results.filter((r) => r === null).length,
     "gen_ai.usage.input_tokens": inputTokens,
     "gen_ai.usage.output_tokens": outputTokens,
+    ...(costUsd !== null && { "gen_ai.usage.cost": costUsd }),
   });
-  opts.onEvent({ type: "done", latencyMs: Date.now() - started, inputTokens, outputTokens });
+  opts.onEvent({ type: "done", latencyMs: Date.now() - started, inputTokens, outputTokens, costUsd });
+  return calls;
 }

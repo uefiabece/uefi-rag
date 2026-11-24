@@ -76,6 +76,25 @@ uefi-uefimcp-<disciplina>/
 
 A pasta imediatamente abaixo de `content/` vira a `section` do documento. Arquivos diretamente em `content/` ficam com `section = "outros"`.
 
+## `precos.config.json`
+
+Preço por milhão de tokens (entrada e saída, em USD) de cada `provedor:modelo`, usado para o custo por consulta (`server/src/cost.ts`):
+
+```jsonc
+{
+  "moeda": "USD",
+  "atualizado": "2026-06-24",
+  "modelos": {
+    "anthropic:claude-opus-5": { "entrada": 5, "saida": 25 }
+  }
+}
+```
+
+- `ollama` e modelos terminados em `:free` (OpenRouter) custam zero, sem entrada na tabela;
+- o id devolvido pelo provedor pode ser mais específico que a chave (`claude-opus-5-20260401`): vale o prefixo mais longo, separado por `-`;
+- modelo ausente fica **sem preço** (`null`), nunca zero. Para usar `LLM_PROVIDER=openai` com um modelo pago, acrescente a chave `openai:<modelo>` com o preço conferido na fonte;
+- preço muda: atualize o arquivo e a data em `atualizado`. Custos já gravados em `geracoes` não são recalculados.
+
 ## `conselho.config.json`
 
 ```jsonc

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { answer } from "./answer.js";
 import { convene, loadCouncil, professorCoverage, selectProfessors } from "./council.js";
 import { ROOT, settings } from "./config.js";
+import { costSummary, recordQuery, type GenerationRecord } from "./cost.js";
 import { getDb } from "./db.js";
 import { getGenerator } from "./generate.js";
 import { loadGraph } from "./graph.js";
@@ -138,7 +139,11 @@ app.post("/api/ask", async (req, reply) => {
       usage: result.usage,
       latencyMs: result.latencyMs,
       retrievalMs: result.retrievalMs,
+      costUsd: result.costUsd,
     });
+    record(req.log, "resposta", [
+      { etapa: null, provider: result.provider, model: result.model, usage: result.usage, costUsd: result.costUsd, latencyMs: result.latencyMs - result.retrievalMs },
+    ]);
   } catch (err) {
     if (!abort.signal.aborted) {
       req.log.error(err);
@@ -186,7 +191,7 @@ app.post("/api/council", async (req, reply) => {
   const abort = new AbortController();
   res.on("close", () => abort.abort());
   try {
-    await convene(parsed.data.question, {
+    const calls = await convene(parsed.data.question, {
       professors: parsed.data.professors,
       publicOnly: parsed.data.publicOnly,
       signal: abort.signal,
@@ -195,6 +200,7 @@ app.post("/api/council", async (req, reply) => {
         res.write(`event: ${type}\ndata: ${JSON.stringify(data)}\n\n`);
       },
     });
+    record(req.log, "conselho", calls);
   } catch (err) {
     if (!abort.signal.aborted) {
       req.log.error(err);
@@ -203,6 +209,17 @@ app.post("/api/council", async (req, reply) => {
   } finally {
     res.end();
   }
+});
+
+/** Registrar custo é acessório: se o banco falhar aqui, a resposta já foi entregue e só o log reclama. */
+function record(log: { error: (o: unknown, msg?: string) => void }, tipo: "resposta" | "conselho", calls: GenerationRecord[]) {
+  if (calls.length) recordQuery(tipo, calls).catch((err) => log.error(err, "falha ao registrar o custo da consulta"));
+}
+
+/** Custo por provedor/modelo, por tipo de consulta e das últimas consultas. Só metadados, sem texto. */
+app.get("/api/custos", async (req) => {
+  const limit = Number((req.query as { limit?: string }).limit ?? 20);
+  return costSummary(Number.isFinite(limit) ? limit : 20);
 });
 
 const shutdown = async () => {

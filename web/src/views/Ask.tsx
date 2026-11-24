@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ask, getEval, isDemo, SECTION_LABEL, type DoneInfo, type EvalItemResult, type Health, type Source } from "../api";
+import { ask, formatUsd, getEval, isDemo, SECTION_LABEL, type DoneInfo, type EvalItemResult, type Health, type Source } from "../api";
 import { Markdown } from "../components/Markdown";
 
 interface Turn {
@@ -219,6 +219,7 @@ export function Ask({
                     {t.done.usage && (
                       <span>{(t.done.usage.inputTokens + t.done.usage.outputTokens).toLocaleString("pt-BR")} tokens</span>
                     )}
+                    {t.done.costUsd !== undefined && <span>{formatUsd(t.done.costUsd)}</span>}
                     <span>{t.done.citations.valid.length} fontes citadas</span>
                     {t.done.citations.invalid.length > 0 && (
                       <span className="tag inverted">citação sem fonte: {t.done.citations.invalid.join(", ")}</span>

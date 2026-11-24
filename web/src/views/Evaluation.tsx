@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { getEval, type EvalReport } from "../api";
+import { formatUsd, getEval, type EvalReport } from "../api";
 
 const MODE_LABEL: Record<string, string> = { hybrid: "Híbrida", vector: "Vetorial", lexical: "Léxica" };
 const pct = (x: number | null | undefined) => (x === null || x === undefined ? "–" : `${Math.round(x * 100)}%`);
@@ -46,6 +46,9 @@ export function Evaluation() {
             <div className="stat"><div className="v">{pct(a.factsOk)}</div><div className="l">com todos os fatos do gabarito</div></div>
             <div className="stat"><div className="v">{pct(a.citedExpected)}</div><div className="l">citam o documento esperado</div></div>
             <div className="stat"><div className="v">{(a.medianLatencyMs / 1000).toFixed(1).replace(".", ",")} s</div><div className="l">latência mediana</div></div>
+            {a.costPerAnswerUsd !== undefined && (
+              <div className="stat"><div className="v">{formatUsd(a.costPerAnswerUsd)}</div><div className="l">custo por resposta</div></div>
+            )}
           </div>
           {!!a.errors && (
             <p className="notice small" style={{ marginBottom: 28 }}>

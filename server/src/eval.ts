@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { answer, type Source } from "./answer.js";
 import { ROOT } from "./config.js";
+import { formatUsd, sumCost } from "./cost.js";
 import { getDb } from "./db.js";
 import { getGenerator } from "./generate.js";
 import { DEFAULT_LEXICAL_WEIGHT, search } from "./retrieve.js";
@@ -119,6 +120,7 @@ export async function runEval(opts: EvalOptions) {
           latencyMs: r.latencyMs,
           usage: r.usage,
           model: r.model,
+          costUsd: r.costUsd,
         };
       } catch (err) {
         graded = { error: err instanceof Error ? err.message : String(err), pass: false };
@@ -135,6 +137,8 @@ export async function runEval(opts: EvalOptions) {
   const outOfScope = answered.filter((r) => r.fontes.length === 0);
   const rate = (xs: unknown[], pred: (x: (typeof answered)[number]) => boolean) =>
     xs.length ? (xs as typeof answered).filter(pred).length / xs.length : null;
+  // null se alguma resposta não tem preço conhecido.
+  const totalCostUsd = sumCost(answered.map((r) => (r.answer?.costUsd ?? null) as number | null));
   const answersSummary = generator
     ? {
         n: answered.length,
@@ -146,6 +150,9 @@ export async function runEval(opts: EvalOptions) {
         abstainedCorrectly: rate(outOfScope, (r) => !!r.answer?.abstained),
         falseAbstentions: answerable.filter((r) => r.answer?.abstained && !r.answer?.factsOk).length,
         medianLatencyMs: median(answered.map((r) => Number(r.answer?.latencyMs ?? 0))),
+        totalCostUsd,
+        // Média por resposta, para comparar rodadas de tamanhos diferentes.
+        costPerAnswerUsd: totalCostUsd === null || !answered.length ? null : totalCostUsd / answered.length,
       }
     : null;
 
@@ -181,7 +188,7 @@ export async function runEval(opts: EvalOptions) {
     log(`\nRespostas (${report.generator})`);
     log(`  aprovadas ${pct(answersSummary.pass)} · fatos ${pct(answersSummary.factsOk)} · cita a fonte esperada ${pct(answersSummary.citedExpected)}`);
     log(`  abstenção correta fora do acervo ${pct(answersSummary.abstainedCorrectly)} · abstenções indevidas ${answersSummary.falseAbstentions} · citações inválidas ${answersSummary.invalidCitations}`);
-    log(`  latência mediana ${answersSummary.medianLatencyMs} ms`);
+    log(`  latência mediana ${answersSummary.medianLatencyMs} ms · custo ${formatUsd(answersSummary.totalCostUsd)} (${formatUsd(answersSummary.costPerAnswerUsd)} por resposta)`);
   }
   log(`\nSalvo em ${path.relative(ROOT, path.join(dir, name))}`);
   return report;

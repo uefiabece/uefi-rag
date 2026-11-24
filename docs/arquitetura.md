@@ -144,6 +144,17 @@ Os atributos `gen_ai.*` seguem as convenções semânticas de GenAI do OpenTelem
 
 Privacidade: o destino é um serviço à parte. O texto dos trechos nunca entra nos spans, e `hits.docs` troca o `docId` de documento privado por `"privado"`, porque o nome do arquivo já identifica material com direitos autorais. Pergunta e resposta só entram com `OTEL_CAPTURE_CONTENT=1`, já que a resposta pode citar trechos privados.
 
+## Custo (`cost.ts`)
+
+Cada chamada ao gerador tem custo calculado a partir dos tokens que o provedor devolve e de `precos.config.json`, com o modelo que **respondeu** (o fallback da Anthropic pode trocar de modelo). O custo aparece:
+
+- no evento `done` de `/api/ask` e em cada `perspectiva` e no `done` do conselho (`costUsd`), e na interface ao lado dos tokens;
+- nos spans: `gen_ai.usage.cost` em cada `rag.geracao` e o total em `rag.resposta`/`rag.conselho`, campo que o Langfuse lê como custo;
+- no relatório de avaliação (`totalCostUsd`, `costPerAnswerUsd`) e no cartão "custo por resposta" da aba Avaliação;
+- na tabela `geracoes`, uma linha por chamada, agrupada por `consulta`. A API e os comandos `ask`/`council` gravam; o `eval` não grava, para não misturar medição com uso. `GET /api/custos` e `npm run custos` agregam por provedor/modelo e por tipo.
+
+Desconhecido não vira zero: modelo sem preço tem custo `null`, e qualquer soma com uma parcela `null` também é `null`. O conselho soma só as chamadas que deram certo.
+
 ## Modelo de dados
 
 Definido em `server/src/db.ts` e aplicado (idempotente) a cada abertura do banco.
@@ -155,8 +166,9 @@ Definido em `server/src/db.ts` e aplicado (idempotente) a cada abertura do banco
 | `chunks` | `id` (bigserial) | doc_id → documents (cascata), ord, heading, page_start, page_end, text, text_hash, tokens, embedding `vector(d)`, tsv (gerada) |
 | `graph_nodes` | `id` | type, label, data (jsonb, inclui visibilidade e códigos) |
 | `graph_edges` | (src, dst, type) | weight, evidence (jsonb: documento, visibilidade, detalhe) |
+| `geracoes` | `id` (bigserial) | consulta, tipo (`resposta`/`conselho`), etapa (professor ou `sintese`), provedor, modelo, input_tokens, output_tokens, custo_usd (null sem preço), latencia_ms, criado_em. Só metadados, sem texto |
 
-Índices: GIN em `chunks.tsv`, HNSW (`vector_cosine_ops`) em `chunks.embedding` criado quando a dimensão é conhecida, B-tree em `chunks.doc_id`.
+Índices: GIN em `chunks.tsv`, HNSW (`vector_cosine_ops`) em `chunks.embedding` criado quando a dimensão é conhecida, B-tree em `chunks.doc_id`, `geracoes.consulta` e `geracoes.criado_em`.
 
 `f_unaccent` é um invólucro `IMMUTABLE` de `unaccent`, necessário para usá-lo na coluna gerada.
 

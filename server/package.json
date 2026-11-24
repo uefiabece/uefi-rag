@@ -9,6 +9,7 @@
     "search": "tsx src/cli.ts search",
     "ask": "tsx src/cli.ts ask",
     "council": "tsx src/cli.ts council",
+    "custos": "tsx src/cli.ts custos",
     "serve": "tsx src/api.ts",
     "mcp": "tsx src/mcp.ts",
     "eval": "tsx src/cli.ts eval",

@@ -73,6 +73,7 @@ async function main() {
     }
     case "ask": {
       const { answer } = await import("./answer.js");
+      const { formatUsd, recordQuery } = await import("./cost.js");
       const question = positionals.join(" ");
       const result = await answer(question, [], filters, {
         onSources: (sources) => {
@@ -82,29 +83,60 @@ async function main() {
         },
         onText: (t) => process.stdout.write(t),
       });
-      console.log(`\n\n— ${result.model} · ${result.latencyMs} ms · citações: ${result.citations.valid.join(", ") || "nenhuma"}`);
+      console.log(`\n\n— ${result.model} · ${result.latencyMs} ms · ${formatUsd(result.costUsd)} · citações: ${result.citations.valid.join(", ") || "nenhuma"}`);
       if (result.citations.invalid.length) console.log(`  citações sem fonte: ${result.citations.invalid.join(", ")}`);
+      await recordQuery("resposta", [
+        { etapa: null, provider: result.provider, model: result.model, usage: result.usage, costUsd: result.costUsd, latencyMs: result.latencyMs - result.retrievalMs },
+      ]);
       break;
     }
     case "council": {
       const { convene, loadCouncil, SYNTHESIS_ID } = await import("./council.js");
+      const { formatUsd, recordQuery } = await import("./cost.js");
       const names = new Map(loadCouncil().professores.map((p) => [p.id, p.titulo]));
       names.set(SYNTHESIS_ID, "Síntese do conselho");
       // Os professores escrevem em paralelo; no terminal, cada perspectiva sai inteira quando termina.
       const buffers = new Map<string, string>();
-      await convene(positionals.join(" "), {
+      const calls = await convene(positionals.join(" "), {
         professors: values.prof ? values.prof.split(",") : undefined,
         publicOnly: values.public,
         onEvent: (e) => {
           if (e.type === "sources") console.log(`· ${names.get(e.professor)}: ${e.sources.length} trechos do acervo da área`);
           if (e.type === "delta") buffers.set(e.professor, (buffers.get(e.professor) ?? "") + e.text);
           if (e.type === "perspectiva") {
-            const stats = e.error ? `erro: ${e.error}` : `${e.citations.valid.length} citações · ${e.general} [geral] · ${e.latencyMs} ms`;
+            const stats = e.error
+              ? `erro: ${e.error}`
+              : `${e.citations.valid.length} citações · ${e.general} [geral] · ${e.latencyMs} ms · ${formatUsd(e.costUsd)}`;
             console.log(`\n── ${names.get(e.professor)} (${stats})\n\n${buffers.get(e.professor) ?? ""}`);
           }
-          if (e.type === "done") console.log(`\n— ${e.latencyMs} ms · ${e.inputTokens + e.outputTokens} tokens`);
+          if (e.type === "done") console.log(`\n— ${e.latencyMs} ms · ${e.inputTokens + e.outputTokens} tokens · ${formatUsd(e.costUsd)}`);
         },
       });
+      if (calls.length) await recordQuery("conselho", calls);
+      break;
+    }
+    case "custos": {
+      const { costSummary, formatUsd } = await import("./cost.js");
+      const n = (x: number, um: string, varios: string) => `${String(x).padStart(4)} ${x === 1 ? um : varios}`;
+      const s = await costSummary(values.limit ? Number(values.limit) : 10);
+      if (!s.porProvedor.length) {
+        console.log("Nenhuma consulta registrada ainda. O registro começa com npm run ask, npm run council ou a API.");
+        break;
+      }
+      console.log(`Custo por provedor e modelo (desde ${new Date(s.desde!).toLocaleString("pt-BR")})`);
+      for (const p of s.porProvedor) {
+        const sem = p.semPreco ? ` (${p.semPreco} chamadas sem preço)` : "";
+        const tokens = String(p.inputTokens + p.outputTokens).padStart(9);
+        console.log(`  ${`${p.provedor}:${p.modelo}`.padEnd(48)} ${n(p.consultas, "consulta ", "consultas")} ${n(p.chamadas, "chamada ", "chamadas")} ${tokens} tokens  ${formatUsd(p.custoUsd)}${sem}`);
+      }
+      console.log("\nPor tipo de consulta");
+      for (const t of s.porTipo) {
+        console.log(`  ${t.tipo.padEnd(10)} ${n(t.consultas, "consulta", "consultas")} · média ${formatUsd(t.custoMedioUsd)} · total ${formatUsd(t.custoTotalUsd)}`);
+      }
+      console.log("\nÚltimas consultas");
+      for (const u of s.ultimas) {
+        console.log(`  ${new Date(u.criadoEm).toLocaleString("pt-BR")}  ${u.tipo.padEnd(9)} ${n(u.chamadas, "chamada ", "chamadas")}  ${formatUsd(u.custoUsd).padEnd(14)} ${u.modelos.join(", ")}`);
+      }
       break;
     }
     case "graph": {
@@ -130,7 +162,7 @@ async function main() {
       break;
     }
     default:
-      console.log("Comandos: ingest [--reset] [--force] [--repo X] | search <consulta> | ask <pergunta> | council <pergunta> [--prof a,b] | graph | eval | export");
+      console.log("Comandos: ingest [--reset] [--force] [--repo X] | search <consulta> | ask <pergunta> | council <pergunta> [--prof a,b] | custos [--limit N] | graph | eval | export");
   }
 }
 

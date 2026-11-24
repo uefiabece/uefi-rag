@@ -134,6 +134,24 @@ CREATE TABLE IF NOT EXISTS graph_edges (
   evidence  jsonb NOT NULL DEFAULT '[]',
   PRIMARY KEY (src, dst, type)
 );
+
+-- Uma linha por chamada ao gerador, para custo por consulta e por provedor. Só metadados: nada de
+-- pergunta, resposta ou trecho, para que ela possa ser lida sem cuidar da fronteira público × privado.
+CREATE TABLE IF NOT EXISTS geracoes (
+  id            bigserial PRIMARY KEY,
+  consulta      text NOT NULL,              -- agrupa as chamadas de uma pergunta (o conselho faz várias)
+  tipo          text NOT NULL CHECK (tipo IN ('resposta', 'conselho')),
+  etapa         text,                       -- id do professor, 'sintese', ou null numa resposta comum
+  provedor      text NOT NULL,
+  modelo        text NOT NULL,
+  input_tokens  int,
+  output_tokens int,
+  custo_usd     double precision,           -- null quando o modelo não tem preço em precos.config.json
+  latencia_ms   int NOT NULL,
+  criado_em     timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS geracoes_consulta_idx ON geracoes (consulta);
+CREATE INDEX IF NOT EXISTS geracoes_criado_idx ON geracoes (criado_em);
 `;
 
 async function migrate(db: Db) {

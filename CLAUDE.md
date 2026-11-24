@@ -25,6 +25,7 @@ npm run graph            # reconstrói o grafo (precisa rodar depois de ingest)
 npm run search -- "consulta" [--mode vector|lexical|hybrid] [--k 8]
 npm run ask -- "pergunta"
 npm run council -- "pergunta" --prof a,b,c
+npm run custos           # custo por provedor/modelo e das últimas consultas
 npm run eval [-- --no-answers] [-- --set privado]
 npm run export           # gera web/public/demo/*.json (só público)
 ```
@@ -67,5 +68,6 @@ Antes de terminar uma mudança: `npm test` e `npm run typecheck`.
 | Provedores de LLM | `generate.ts`, `embed.ts` |
 | Rotas HTTP | `api.ts` |
 | Ferramentas MCP | `mcp.ts` |
+| Preços e custo por consulta | `cost.ts`, `precos.config.json` |
 | Spans por etapa (OpenTelemetry) | `trace.ts`; spans em `retrieve.ts`, `answer.ts` e `council.ts` |
 | Cliente web e modo demo | `web/src/api.ts` |

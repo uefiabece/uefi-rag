@@ -13,6 +13,7 @@
     "search": "npm run search -w server --",
     "ask": "npm run ask -w server --",
     "council": "npm run council -w server --",
+    "custos": "npm run custos -w server --",
     "serve": "npm run serve -w server",
     "mcp": "npm run mcp -w server",
     "eval": "npm run eval -w server --",

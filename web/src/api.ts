@@ -36,6 +36,15 @@ export interface DoneInfo {
   usage: { inputTokens: number; outputTokens: number } | null;
   latencyMs: number;
   retrievalMs: number;
+  /** USD; null = modelo sem preço conhecido; ausente em respostas gravadas da demo. */
+  costUsd?: number | null;
+}
+
+/** Mesmo formato de formatUsd em server/src/cost.ts. */
+export function formatUsd(x: number | null): string {
+  if (x === null) return "sem preço";
+  if (x === 0) return "grátis";
+  return `US$ ${x.toLocaleString("pt-BR", { minimumFractionDigits: x < 1 ? 4 : 2, maximumFractionDigits: x < 1 ? 4 : 2 })}`;
 }
 
 export interface DocumentRow {
@@ -128,6 +137,8 @@ export interface EvalReport {
     abstainedCorrectly: number | null;
     falseAbstentions: number;
     medianLatencyMs: number;
+    totalCostUsd?: number | null;
+    costPerAnswerUsd?: number | null;
   };
   items: EvalItemResult[];
 }
@@ -257,14 +268,22 @@ export interface PerspectiveInfo {
   model: string | null;
   latencyMs: number;
   outputTokens: number | null;
+  costUsd?: number | null;
   error?: string;
+}
+
+export interface CouncilDone {
+  latencyMs: number;
+  inputTokens: number;
+  outputTokens: number;
+  costUsd?: number | null;
 }
 
 export interface CouncilHandlers {
   onSources: (professor: string, sources: Source[]) => void;
   onDelta: (professor: string, text: string) => void;
   onPerspective: (info: PerspectiveInfo) => void;
-  onDone: (info: { latencyMs: number; inputTokens: number; outputTokens: number }) => void;
+  onDone: (info: CouncilDone) => void;
   onError: (message: string) => void;
 }
 
