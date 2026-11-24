@@ -1,11 +1,11 @@
 {
-  "date": "2026-11-13T00:37:11.826Z",
+  "date": "2026-11-24T19:04:04.943Z",
   "label": null,
   "set": "publico",
   "k": 8,
   "lexicalWeight": 0.5,
   "embedding": "bge-m3:1024",
-  "generator": "anthropic:claude-opus-5",
+  "generator": "openai:nvidia/nemotron-3-ultra-550b-a55b:free",
   "retrieval": {
     "hybrid": {
       "hit1": 0.7391304347826086,
@@ -30,15 +30,15 @@
     }
   },
   "answers": {
-    "n": 0,
-    "errors": 26,
-    "pass": null,
-    "factsOk": null,
-    "citedExpected": null,
+    "n": 26,
+    "errors": 0,
+    "pass": 0.8076923076923077,
+    "factsOk": 0.9130434782608695,
+    "citedExpected": 0.7391304347826086,
     "invalidCitations": 0,
-    "abstainedCorrectly": null,
-    "falseAbstentions": 0,
-    "medianLatencyMs": 0
+    "abstainedCorrectly": 1,
+    "falseAbstentions": 2,
+    "medianLatencyMs": 14731
   },
   "items": [
     {
@@ -102,8 +102,93 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Conforme o cadastro oficial do curso, o BC&T tem:\n\n- **Prazo mínimo:** 9 quadrimestres (3 anos)  \n- **Prazo máximo:** 18 quadrimestres (6 anos)  \n\n[4]",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            4
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 26",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 36–37",
+            "heading": "8.5 Apresentação gráfica de um perfil de formação"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 35–36",
+            "heading": "8.5 Apresentação gráfica de um perfil de formação"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Dados do Curso"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 18–19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/tutorial_integralizacao_cursos_especificos_bct.pdf",
+            "title": "Tutorial integralizacao cursos especificos BCT",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 6–7",
+            "heading": "Resolução Consepe Nº 103"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/tutorial_integralizacao_cursos_especificos_bct.pdf",
+            "title": "Tutorial integralizacao cursos especificos BCT",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 9–11",
+            "heading": "Emat 48 48 576 26 312 48 576 300 300 300 3720"
+          }
+        ],
+        "latencyMs": 9542,
+        "usage": {
+          "inputTokens": 3240,
+          "outputTokens": 383
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -162,8 +247,92 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "O PPC 2023 do BC&T exige **84 créditos** em disciplinas obrigatórias [1].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true
+        ],
+        "citations": {
+          "valid": [
+            1
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Componentes Curriculares — Quadro Síntese (PPC 2023)"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 27",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 18–19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Disciplinas Obrigatórias — 84 créditos / 1.008h › Eixo 7 — Interdisciplinar"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 56–57",
+            "heading": "17 Rol De Disciplinas"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Disciplinas Obrigatórias — 84 créditos / 1.008h › Eixo 2 — Processos de Transformação"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          }
+        ],
+        "latencyMs": 8453,
+        "usage": {
+          "inputTokens": 3500,
+          "outputTokens": 461
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -226,8 +395,91 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "No PPC 2023 do BC&T há dois valores diferentes nas fontes fornecidas:\n\n*   **Quadro 3 do PPC 2023 (fonte 3):** indica **384 horas** (32 créditos) para disciplinas de opção limitada. Esse mesmo quadro mostra 60 créditos (720h) para disciplinas livres, valor confirmado pelo texto da seção 8.3 (fonte 2).\n*   **Seção 8.3 do PPC 2023 (fonte 6):** afirma que as disciplinas de opção limitada correspondem a **480 horas** (o que equivaleria a 40 créditos), com livres totalizando 624 horas (52 créditos).\n\nPortanto, as fontes oficiais do mesmo PPC 2023 apresentam uma discrepância: 384h no quadro síntese versus 480h no texto descritivo. Para definir o valor exigido na sua matrícula, consulte a coordenação do curso ou o catálogo de disciplinas vigente.",
+        "pass": false,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 27",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Componentes Curriculares — Quadro Síntese (PPC 2023)"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 18–19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 24–25",
+            "heading": "8.2. Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 26",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/orientacoes_curricularizacao_extensao.pdf",
+            "title": "Orientacoes curricularizacao extensao",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 3–4",
+            "heading": "As Atividades De Extensão São Avaliadas Pela Coordenação Do Bc&t E As"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Disciplinas Obrigatórias — 84 créditos / 1.008h › Eixo 7 — Interdisciplinar"
+          }
+        ],
+        "latencyMs": 44554,
+        "usage": {
+          "inputTokens": 3401,
+          "outputTokens": 2194
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -290,8 +542,96 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Pelo PPC 2023 do BC&T, o estudante deve cumprir **240 horas de atividades de extensão e cultura** e **48 horas de atividades complementares** [1][3][4][5].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            3,
+            4,
+            5
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/orientacoes_curricularizacao_extensao.pdf",
+            "title": "Orientacoes curricularizacao extensao",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Que Eu Faço?"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/orientacoes_curricularizacao_extensao.pdf",
+            "title": "Orientacoes curricularizacao extensao",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 3–4",
+            "heading": "As Atividades De Extensão São Avaliadas Pela Coordenação Do Bc&t E As"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/orientacoes_curricularizacao_extensao.pdf",
+            "title": "Orientacoes curricularizacao extensao",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Que Eu Faço?"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Componentes Curriculares — Quadro Síntese (PPC 2023)"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 26",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Atividades de Extensão e Cultura — 20 créditos / 240h"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 43",
+            "heading": "11 Atividades De Extensão E Cultura"
+          }
+        ],
+        "latencyMs": 13949,
+        "usage": {
+          "inputTokens": 3030,
+          "outputTokens": 452
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -351,8 +691,94 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Segundo o **PPC 2023** e os dados cadastrais do curso, o BC&T oferece **aproximadamente 1.448 vagas por ano**, distribuídas da seguinte forma:\n\n- **Santo André (SA):** 1.013 vagas  \n- **São Bernardo do Campo (SBC):** 435 vagas  \n\nEsses valores constam na justificativa de oferta do PPC 2023 (dados do Censo 2020) [1] e na ficha de dados do currículo do curso (PPC vigente 2023) [6].\n\n> **Nota:** No **PPC 2015** o número total era diferente: 1.125 vagas em Santo André (562 matutinas + 563 noturnas) e 435 em São Bernardo do Campo (217 matutinas + 218 noturnas), totalizando 1.560 vagas para o processo seletivo de 2014 [2].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            2,
+            6
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 12",
+            "heading": "4.1 Justificativa de oferta de curso"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 11",
+            "heading": "Forma De Acesso Ao Curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 7",
+            "heading": "3 Apresentação"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 9",
+            "heading": "3 Apresentação"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Dados do Curso"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 18–19",
+            "heading": "Regime De Ensino"
+          }
+        ],
+        "latencyMs": 18988,
+        "usage": {
+          "inputTokens": 3384,
+          "outputTokens": 799
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -419,8 +845,95 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Conforme o PPC 2023, o ingressante do BC&T é matriculado automaticamente em **uma das três disciplinas do eixo de Humanidades** — não há uma única disciplina fixa para todos. As três opções são:\n\n- **BIR0004-15 – Bases Epistemológicas da Ciência Moderna**  \n- **BIQ0602-15 – Estrutura e Dinâmica Social**  \n- **BIR0603-15 – Ciência, Tecnologia e Sociedade** [1]\n\nA coordenação distribui os calouros entre as três (a seleção é automática no ato da matrícula), e as outras duas disciplinas são cursadas nos quadrimestres seguintes [1][2].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            2
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Disciplinas Obrigatórias — 84 créditos / 1.008h › Eixo 6 — Humanidades"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/disciplinas_limitadas_2025.pdf",
+            "title": "Disciplinas limitadas 2025",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1–2",
+            "heading": null
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Informações Institucionais"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 28",
+            "heading": "8.3.1. Formação do aluno do Bacharelado em Biotecnologia"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 27",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 2",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Grade Sugerida — PPC 2023"
+          }
+        ],
+        "latencyMs": 17860,
+        "usage": {
+          "inputTokens": 3441,
+          "outputTokens": 759
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -483,8 +996,105 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "**Resposta direta:**  \nNo **PPC 2023** (válido para ingressantes a partir de 2023), **Interações Atômicas e Moleculares (BCK0104‑15) deixou de ser obrigatória** e passou a integrar o conjunto de **disciplinas de opção limitada** do BC&T [1][9].  \n\nPara **alunos ingressantes até 2022** (que seguem o **PPC 2015**), a disciplina **continua obrigatória** [1][2].  \n\n---\n\n### Detalhes por documento\n\n| Documento | Situação da disciplina |\n|-----------|------------------------|\n| **PPC 2015** | Obrigatória (constava no quadro de disciplinas obrigatórias do curso) [1]. |\n| **PPC 2023** | Reclassificada como **opção limitada** — o aluno pode escolhê‑la para cumprir os créditos de opção limitada, mas não é mais de cursamento compulsório [1][9]. |\n| **Planejamento de oferta 2026** | Listada com asterisco e observação: “*Disciplina obrigatória. Oferta apenas para alunos veteranos 2022 e anterior” — ou seja, a turma de 2026 só a oferece para quem ainda está sob as regras do PPC 2015 [2]. |\n| **Orientação da Coordenação do BC&T (2023)** | Alerta que a migração para o PPC 2023 dispensa o cursamento de IAM, confirmando que ela não é mais obrigatória no novo projeto [7]. |\n\n---\n\n### O que isso significa na prática\n- **Se você entrou na UFABC em 2023 ou depois:** não precisa cursar BCK0104‑15 para se formar; ela é uma opção dentro do bloco de disciplinas de opção limitada (60 créditos livres + opção limitada, conforme PPC 2023) [3].  \n- **Se você entrou em 2022 ou antes:** a disciplina permanece obrigatória no seu histórico e no seu plano de curso; a oferta em 2026 é mantida exatamente para atender a esses alunos [2].  \n\n---\n\n### Documento que resolveria dúvidas residuais\n- **Catálogo de disciplinas / “Lista de Disciplinas de Opção Limitada” do BC&T (documento complementar ao PPC 2023)** — lá constará BCK0104‑15 com a classificação oficial de “opção limitada” e seus pré‑requisitos, se houver.  \n- **Coordenação do BC&T** — para confirmar qual PPC você está vinculado e se há alguma regra de transição específica para o seu caso.",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            2,
+            3,
+            7,
+            9
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Disciplinas Obrigatórias — 84 créditos / 1.008h › Eixo 7 — Interdisciplinar"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 2–3",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 27",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 67–68",
+            "heading": "3 Continuação quantização do momento angular e da energia do átomo de"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 14–15",
+            "heading": "5.1 Objetivo Geral"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/orientacoes_curricularizacao_extensao.pdf",
+            "title": "Orientacoes curricularizacao extensao",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 3–4",
+            "heading": "As Atividades De Extensão São Avaliadas Pela Coordenação Do Bc&t E As"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 9,
+            "docId": null,
+            "title": "Grafo de contexto (extraído das ementas)",
+            "subject": "Acervo",
+            "pages": null,
+            "heading": null
+          }
+        ],
+        "latencyMs": 30273,
+        "usage": {
+          "inputTokens": 3741,
+          "outputTokens": 1777
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -548,8 +1158,104 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "O código da disciplina é **BCJ0204-15** e sua carga horária total é **60 horas** [2][3][4][7].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            2,
+            3,
+            4,
+            7
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 47–48",
+            "heading": "10 Energia cinética rotacional, torque e o produto vetorial, momento de inércia e"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 56–57",
+            "heading": "17 Rol De Disciplinas"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Disciplinas Obrigatórias — 84 créditos / 1.008h › Eixo 2 — Processos de Transformação"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 46",
+            "heading": "Sistema De Avaliação Do Projeto Do Curso"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 49–50",
+            "heading": "4 Calor e trabalho em processos termodinâmicos, caminhos entre estados"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 12–13",
+            "heading": "4.1 Justificativa de oferta de curso"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 25",
+            "heading": "8.2. Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/tutorial_integralizacao_cursos_especificos_bct.pdf",
+            "title": "Tutorial integralizacao cursos especificos BCT",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 8",
+            "heading": "Emat 68 68 90 120 136 204 204 2448 226 2712 0 0"
+          },
+          {
+            "n": 9,
+            "docId": null,
+            "title": "Grafo de contexto (extraído das ementas)",
+            "subject": "Acervo",
+            "pages": null,
+            "heading": null
+          }
+        ],
+        "latencyMs": 8385,
+        "usage": {
+          "inputTokens": 4383,
+          "outputTokens": 445
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -612,8 +1318,103 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Projeto Dirigido será oferecido nos **três quadrimestres letivos de 2026**.  \nA razão é a mesma dos anos anteriores: **limitações de infraestrutura e disponibilidade de corpo docente** [1][2]. O planejamento mostra a disciplina listada em cada um dos três quadrimestres (1º, 2º e 3º) [3].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            2,
+            3
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 2",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 92",
+            "heading": "11 Limites de Funções II e Continuidade"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-context/projects/uefi-uefimcp-pd.md",
+            "title": "Project: uefi-uefimcp-pd",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "Project: uefi-uefimcp-pd › Propósito"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 92–93",
+            "heading": "12 Apresentações finais"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 31–32",
+            "heading": "Opção Limitada Opção Limitada"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 28",
+            "heading": "Trabalho De Conclusão De Curso"
+          },
+          {
+            "n": 9,
+            "docId": null,
+            "title": "Grafo de contexto (extraído das ementas)",
+            "subject": "Acervo",
+            "pages": null,
+            "heading": null
+          }
+        ],
+        "latencyMs": 12023,
+        "usage": {
+          "inputTokens": 3296,
+          "outputTokens": 371
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -672,8 +1473,93 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "A carga horária total do Bacharelado em Biotecnologia no PPC 2023 é de **3.209 horas** [1][4].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            4
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 5",
+            "heading": "2. Dados Do Curso"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 5",
+            "heading": "2. Dados Do Curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 5",
+            "heading": "2. Dados Do Curso"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 24–25",
+            "heading": "8.2. Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Componentes Curriculares — Quadro Síntese (PPC 2023)"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 24–25",
+            "heading": "Nhi5015-15 - Libras (4-0-2)"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/disciplinas_limitadas_2023.pdf",
+            "title": "Disciplinas limitadas 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": null
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": null
+          }
+        ],
+        "latencyMs": 7236,
+        "usage": {
+          "inputTokens": 3463,
+          "outputTokens": 385
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -735,8 +1621,96 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Sim. Em ambos os PPCs (2018 e 2023) o estágio supervisionado é **obrigatório** e tem carga horária mínima de **200 horas** [1][2][3][4].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 5",
+            "heading": "2. Dados Do Curso"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 5",
+            "heading": "2. Dados Do Curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 49",
+            "heading": "12. Estágio Supervisionado"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 38",
+            "heading": "11. Estágio Supervisionado"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 28–29",
+            "heading": "8.3.1. Formação do aluno do Bacharelado em Biotecnologia"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 24–25",
+            "heading": "Nhi5015-15 - Libras (4-0-2)"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/tutorial_integralizacao_cursos_especificos_bct.pdf",
+            "title": "Tutorial integralizacao cursos especificos BCT",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 11–12",
+            "heading": "Emat 48 48 576 26 312 48 576 300 300 300 3720"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/tutorial_integralizacao_cursos_especificos_bct.pdf",
+            "title": "Tutorial integralizacao cursos especificos BCT",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 12–13",
+            "heading": "Emat 48 48 576 26 312 48 576 300 300 300 3720"
+          }
+        ],
+        "latencyMs": 14557,
+        "usage": {
+          "inputTokens": 3646,
+          "outputTokens": 432
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -797,8 +1771,94 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "De acordo com os Projetos Pedagógicos do Curso (PPC) do Bacharelado em Biotecnologia:\n\n- **Prazo mínimo para integralização**: 13 quadrimestres (tanto para o período matutino quanto noturno)  \n- **Prazo máximo para integralização**: 26 quadrimestres  \n\nEssas informações constam tanto no PPC 2023 [1] quanto no PPC 2018 [2], com redação idêntica.",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            2
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 5",
+            "heading": "2. Dados Do Curso"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 5",
+            "heading": "2. Dados Do Curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 6",
+            "heading": "2 Dados Do Curso"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 44–45",
+            "heading": "10. Atividades De Extensão E Cultura"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 44",
+            "heading": "10. Atividades De Extensão E Cultura"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 3",
+            "heading": "Dados Do Curso"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 24–25",
+            "heading": "Nhi5015-15 - Libras (4-0-2)"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/tutorial_integralizacao_cursos_especificos_bct.pdf",
+            "title": "Tutorial integralizacao cursos especificos BCT",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 13–14",
+            "heading": "Emat 48 48 576 26 312 48 576 300 300 300 3720"
+          }
+        ],
+        "latencyMs": 14731,
+        "usage": {
+          "inputTokens": 3381,
+          "outputTokens": 420
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -862,8 +1922,93 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Não. Conforme as regras de transição, discentes ingressantes até 2022 **podem optar** por concluir o curso sob as regras do PPC 2018 **ou** migrar para o PPC 2023. A escolha é de inteira responsabilidade do discente, que deve acompanhar a situação curricular junto à coordenação [1].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": "1. Aplicação do novo PPC"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": null
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": "2. Condições de Transição e Convalidação"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Grade Sugerida — PPC 2023"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/orientacoes_curricularizacao_extensao.pdf",
+            "title": "Orientacoes curricularizacao extensao",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 2–3",
+            "heading": "Uma Vez Que O Ppc É De 2023, Portanto, Não São Aceitos “certificados"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 10",
+            "heading": "3.3. Pertinência do Bacharelado em Biotecnologia em relação ao PDI da UFABC"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 18",
+            "heading": "6. Requisitos De Acesso E Regime De Matrícula"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 26",
+            "heading": "8.2. Componentes curriculares para a integralização do curso"
+          }
+        ],
+        "latencyMs": 11787,
+        "usage": {
+          "inputTokens": 3134,
+          "outputTokens": 354
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -922,8 +2067,92 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Segundo as regras de transição do Bacharelado em Biotecnologia, os créditos de disciplinas **obrigatórias cursadas no PPC 2018 que não tenham convalidação com a nova matriz (PPC 2023) serão computados como créditos em disciplinas de opção limitada** para fins de integralização no PPC 2023 [1].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true
+        ],
+        "citations": {
+          "valid": [
+            1
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": "2. Condições de Transição e Convalidação"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": null
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 2",
+            "heading": "1. Tabela de Transição de Matriz Curricular"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/orientacoes_curricularizacao_extensao.pdf",
+            "title": "Orientacoes curricularizacao extensao",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 2–3",
+            "heading": "Uma Vez Que O Ppc É De 2023, Portanto, Não São Aceitos “certificados"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/orientacoes_curricularizacao_extensao.pdf",
+            "title": "Orientacoes curricularizacao extensao",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 3",
+            "heading": "Uma Vez Que O Ppc É De 2023, Portanto, Não São Aceitos “certificados"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 22–23",
+            "heading": "8.1. Fundamentação Legal"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 35",
+            "heading": "6 Créditos"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 39",
+            "heading": "10 Ações Acadêmicas Complementares À Formação"
+          }
+        ],
+        "latencyMs": 9970,
+        "usage": {
+          "inputTokens": 2848,
+          "outputTokens": 410
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -984,8 +2213,104 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Sim. Segundo os documentos de disciplinas de opção limitada alinhados ao **PPC 2023** (listas de 2023 e 2025), a disciplina **Educação Ambiental** faz parte do rol de opção limitada do Bacharelado em Biotecnologia [1][2].\n\n- **Código:** `ESZU025-17`  \n- **TPEI:** `2 - 2 - 0 - 4` (2 créditos teóricos, 2 práticos, 0 de estágio, 4 de iniciação científica; total 4 créditos / 48 h) [1][2][9]\n\n> **Nota:** No PPC 2018 a disciplina aparecia com código `ESZ015-13` e carga TPI `2-2-4` [3], mas as referências atuais (2023/2025) trazem o código e o TPEI acima.",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            2,
+            3,
+            9
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/disciplinas_limitadas_2025.pdf",
+            "title": "Disciplinas limitadas 2025",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": null
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/disciplinas_limitadas_2023.pdf",
+            "title": "Disciplinas limitadas 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": null
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 26–27",
+            "heading": "Estágio / 200 6,23"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 3",
+            "heading": "17 Educação Ambiental 4 opção limitada"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 3",
+            "heading": "17 Avaliação de Impactos Ambientais 4 opção limitada"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 27",
+            "heading": "8.3.1. Formação do aluno do Bacharelado em Biotecnologia"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/regras_transicao_2023_e_2018.pdf",
+            "title": "Regras transicao 2023 e 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 5",
+            "heading": "Estu010-17"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 26",
+            "heading": "Estágio / 200 6,23"
+          },
+          {
+            "n": 9,
+            "docId": null,
+            "title": "Grafo de contexto (extraído das ementas)",
+            "subject": "Acervo",
+            "pages": null,
+            "heading": null
+          }
+        ],
+        "latencyMs": 25731,
+        "usage": {
+          "inputTokens": 4361,
+          "outputTokens": 1217
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1043,8 +2368,90 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Segundo os documentos disponíveis, os valores mudam entre o **PPC 2018** e o **PPC 2023**:\n\n| PPC | Disciplinas de Opção Limitada (OL) | Disciplinas Livres (L) |\n|-----|-------------------------------------|------------------------|\n| **2018** (Fonte 1) | 336 horas | 276 horas |\n| **2023** (Fontes 2 e 4) | 168 horas | 168 horas |\n\n**Observações**\n- O PPC 2018 (Fonte 1) lista 336 h de OL e 276 h de L, somando 3208 h totais.\n- O PPC 2023 (Fontes 2 e 4) prevê 168 h de OL e 168 h de L, totalizando 3209 h (inclui também 24 h de TCC, 81 h de atividades extensionistas além das 240 h do BC&T e 200 h de estágio).\n- A tabela de disciplinas de OL do catálogo 2023 (Fonte 8) mostra as opções disponíveis, mas não altera a carga horária total exigida.\n\n**Recomendação**: verifique qual matriz curricular você está vinculado (ano de ingresso ou migração de matriz) no seu histórico ou na coordenação do curso, pois os requisitos diferem entre as duas versões do PPC.",
+        "pass": false,
+        "factsOk": true,
+        "factsFound": [
+          true
+        ],
+        "citations": {
+          "valid": [],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 24–25",
+            "heading": "Nhi5015-15 - Libras (4-0-2)"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 24–25",
+            "heading": "8.2. Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/tutorial_integralizacao_cursos_especificos_bct.pdf",
+            "title": "Tutorial integralizacao cursos especificos BCT",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 12–13",
+            "heading": "Emat 48 48 576 26 312 48 576 300 300 300 3720"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 28–29",
+            "heading": "8.3.1. Formação do aluno do Bacharelado em Biotecnologia"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 28",
+            "heading": "8.3.1. Formação do aluno do Bacharelado em Biotecnologia"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/tutorial_integralizacao_cursos_especificos_bct.pdf",
+            "title": "Tutorial integralizacao cursos especificos BCT",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 11–12",
+            "heading": "Emat 48 48 576 26 312 48 576 300 300 300 3720"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/disciplinas_limitadas_2023.pdf",
+            "title": "Disciplinas limitadas 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 1",
+            "heading": null
+          }
+        ],
+        "latencyMs": 18561,
+        "usage": {
+          "inputTokens": 3840,
+          "outputTokens": 638
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1113,8 +2520,93 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Não. O BC&T **não possui pré-requisitos obrigatórios**. Existem apenas **recomendações** indicadas nos planos de ensino e no Catálogo de Disciplinas [1].\n\nRecomendações mais comuns [1]:\n- Bases Matemáticas → antes de Funções de Uma Variável  \n- Funções de Uma Variável → antes de Funções de Várias Variáveis e EDO  \n- Funções de Uma Variável + Geometria Analítica → antes de Álgebra Linear (opção limitada)  \n- Fenômenos Mecânicos → antes de Fenômenos Térmicos e Eletromagnéticos  \n\nA ausência de pré-requisitos formais dá autonomia ao aluno para montar a trajetória, mas exige responsabilidade no planejamento [1].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [
+            1
+          ],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Pré-requisitos"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 27",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 18–19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 2",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 18",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 27",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/disciplinas_limitadas_2025.pdf",
+            "title": "Disciplinas limitadas 2025",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1–2",
+            "heading": null
+          }
+        ],
+        "latencyMs": 15160,
+        "usage": {
+          "inputTokens": 3567,
+          "outputTokens": 540
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1172,8 +2664,90 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "As fontes fornecidas não contêm informação sobre prazos entre a divulgação do conceito e a prova de recuperação no BC&T. Os documentos tratam da estrutura curricular (créditos obrigatórios, de opção limitada e livres), da organização quadrimestral, da matriz de pré-requisitos e de orientações para planejamento de trajetória, mas não abordam regulamentos de avaliação, calendário de recuperação ou prazos mínimos para realização de exames.\n\nPara obter essa informação, você deve consultar:\n- O **Regulamento de Ensino de Graduação da UFABC** (Resolução ConsEPE vigente), que define prazos e procedimentos de avaliação e recuperação;\n- O **calendário acadêmico oficial** de cada ano/quadrimestre, publicado pela Pró-Reitoria de Graduação (ProGrad);\n- A **coordenação do BC&T** ou a **Divisão de Ensino e Aprendizagem Tutorial (DEAT/PEAT)** para orientações específicas do curso.",
+        "pass": false,
+        "factsOk": false,
+        "factsFound": [
+          false
+        ],
+        "citations": {
+          "valid": [],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": true,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 36–37",
+            "heading": "8.5 Apresentação gráfica de um perfil de formação"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 27",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 18–19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 17",
+            "heading": "Regime De Ensino"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 24",
+            "heading": "Nhi5015-15 - Libras (4-0-2)"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 37",
+            "heading": "8.5 Apresentação gráfica de um perfil de formação"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Disciplinas Obrigatórias — 84 créditos / 1.008h › Eixo 7 — Interdisciplinar"
+          }
+        ],
+        "latencyMs": 24111,
+        "usage": {
+          "inputTokens": 3222,
+          "outputTokens": 673
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1231,8 +2805,100 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "O servidor MCP que cobre **Fenômenos Mecânicos** é o **`uefi-uefimcp-femec`** (nível *subject*), descrito como \"Servidor MCP de Fenômenos Mecânicos, UFABC\" [1].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true
+        ],
+        "citations": {
+          "valid": [
+            1
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-context/projects/uefi-uefimcp-femec.md",
+            "title": "Uefi-uefimcp-femec",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-femec"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-context/projects/uefi-uefimcp-bm.md",
+            "title": "uefi-uefimcp-bm — MCP de Bases Matemáticas",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-bm — MCP de Bases Matemáticas › Propósito"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-context/projects/uefi-uefimcp-fvv.md",
+            "title": "uefi-uefimcp-fvv — MCP de Funções de Várias Variáveis",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-fvv — MCP de Funções de Várias Variáveis › Propósito"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-context/projects/uefi-uefimcp-bm.md",
+            "title": "uefi-uefimcp-bm — MCP de Bases Matemáticas",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-bm — MCP de Bases Matemáticas › Arquivos relevantes"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-context/projects/uefi-uefimcp-neuro.md",
+            "title": "Uefi-uefimcp-neuro",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-neuro"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-context/projects/uefi-uefimcp-introducao-a-neuro.md",
+            "title": "Uefi-uefimcp-introducao-a-neuro",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-introducao-a-neuro"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-context/projects/uefi-uefimcp-engenharias.md",
+            "title": "Project: uefi-uefimcp-engenharias",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "Project: uefi-uefimcp-engenharias"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-context/projects/uefi-uefimcp-engenharias.md",
+            "title": "Project: uefi-uefimcp-engenharias",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "Project: uefi-uefimcp-engenharias › Arquivos relevantes"
+          },
+          {
+            "n": 9,
+            "docId": null,
+            "title": "Grafo de contexto (extraído das ementas)",
+            "subject": "Acervo",
+            "pages": null,
+            "heading": null
+          }
+        ],
+        "latencyMs": 4011,
+        "usage": {
+          "inputTokens": 2461,
+          "outputTokens": 229
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1295,8 +2961,91 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "O UÉFIabecê organiza os servidores MCP em **três camadas** — template, curso e disciplina —, cada uma herdando e especializando a anterior.\n\n---\n\n### 1. Template (base comum)\n- Contém **11 ferramentas genéricas** compartilhadas por todos os servidores:  \n  `get_syllabus`, `get_bibliography`, `get_past_exams`, `search_content`, `get_notes`, `explain_concept`, `get_topic_outline`, `generate_study_plan`, `get_exercises`, `solve_exercise`, `generate_exercise`【1†secao=\"Project: uefi-uefimcp-engenharias › Ferramentas MCP\"】【5†secao=\"Project: uefi-uefimcp-bct › Ferramentas MCP\"】【6†secao=\"Project: uefi-uefimcp-biotec › Ferramentas MCP\"】【7†secao=\"Project: uefi-uefimcp-introducao-a-biotec › Ferramentas MCP\"】【8†secao=\"Project: uefi-uefimcp-introducao-as-engenharias › Ferramentas MCP\"】.\n- Define a **arquitetura padrão** (prompts, loaders, entry point) usada pelos servidores derivados【4†secao=\"uefi-uefimcp-bm — MCP de Bases Matemáticas › Arquivos relevantes\"】.\n\n---\n\n### 2. Camada de **curso** (ex.: Engenharias, BCT, BIOTEC)\n- Herda as 11 ferramentas do template.\n- Adiciona **5 ferramentas específicas do currículo** do curso:  \n  `get_curriculum_structure`, `list_subjects_by_area`, `get_disciplinas_limitadas`, `get_progression_requirements`, `plan_academic_journey`【1†secao=\"Project: uefi-uefimcp-engenharias › Ferramentas MCP\"】【5†secao=\"Project: uefi-uefimcp-bct › Ferramentas MCP\"】【6†secao=\"Project: uefi-uefimcp-biotec › Ferramentas MCP\"】.\n- Cada curso tem seu próprio servidor MCP (ex.: `uefi-uefimcp-engenharias`, `uefi-uefimcp-bct`, `uefi-uefimcp-biotec`) com conteúdo próprio em `content/bibliography/` (PPCs, planejamento de oferta, listas de disciplinas limitadas) e `content/syllabus/` (síntese estrutural do currículo)【1†secao=\"Project: uefi-uefimcp-engenharias › Ferramentas MCP\"】.\n\n---\n\n### 3. Camada de **disciplina** (ex.: Bases Matemáticas, Introdução à Biotecnologia, Introdução às Engenharias)\n- Herda as 11 ferramentas do template.\n- **Pode ou não** adicionar ferramentas próprias:\n  - **Bases Matemáticas (BIS0003-15)**: servidor dedicado (`uefi-uefimcp-bm`) com prompts especializados para ensino e resolução de exercícios com demonstrações matemáticas, além de ementas oficiais e cronogramas por professor/ano【3†secao=\"uefi-uefimcp-bm — MCP de Bases Matemáticas › Propósito\"】【4†secao=\"uefi-uefimcp-bm — MCP de Bases Matemáticas › Arquivos relevantes\"】.\n  - **Introdução à Biotecnologia** e **Introdução às Engenharias**: usam **apenas as ferramentas genéricas do template**, pois são disciplinas introdutórias e o conjunto base é suficiente【7†secao=\"Project: uefi-uefimcp-introducao-a-biotec › Ferramentas MCP\"】【8†secao=\"Project: uefi-uefimcp-introducao-as-engenharias › Ferramentas MCP\"】.\n- Cada disciplina tem seu próprio repositório/servidor (`uefi-uefimcp-<disciplina>`), seguindo o princípio “um MCP por disciplina” definido no ADR 002【2†secao=\"ADR 002 — One MCP Server Per Subject, With a Shared Template › Context\"】.\n\n---\n\n### Resumo da hierarquia\n\n| Camada | Exemplo | Ferramentas | Conteúdo próprio |\n|--------|---------|-------------|------------------|\n| **Template** | (base) | 11 genéricas | Prompts, loaders, estrutura comum |\n| **Curso** | Engenharias, BCT, BIOTEC | 11 + 5 específicas do curso | PPCs, planejamento de oferta, síntese curricular |\n| **Disciplina** | Bases Matemáticas, Introdução à Biotec, Introdução às Engenharias | 11 (+ especiais se houver) | Ementas oficiais, cronogramas, listas, provas, notas de aula da disciplina |\n\nEssa estrutura permite que **cada disciplina tenha conhecimento profundo e fundamentado** (conforme o ADR 002) enquanto reutiliza a infraestrutura comum e, quando relevante, as ferramentas de nível de curso.",
+        "pass": false,
+        "factsOk": true,
+        "factsFound": [
+          true,
+          true
+        ],
+        "citations": {
+          "valid": [],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-context/projects/uefi-uefimcp-engenharias.md",
+            "title": "Project: uefi-uefimcp-engenharias",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "Project: uefi-uefimcp-engenharias › Ferramentas MCP"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-context/decisions/002-mcp-per-subject-architecture.md",
+            "title": "ADR 002 — One MCP Server Per Subject, With a Shared Template",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "ADR 002 — One MCP Server Per Subject, With a Shared Template › Context"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-context/projects/uefi-uefimcp-bm.md",
+            "title": "uefi-uefimcp-bm — MCP de Bases Matemáticas",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-bm — MCP de Bases Matemáticas › Propósito"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-context/projects/uefi-uefimcp-bm.md",
+            "title": "uefi-uefimcp-bm — MCP de Bases Matemáticas",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-bm — MCP de Bases Matemáticas › Arquivos relevantes"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-context/projects/uefi-uefimcp-bct.md",
+            "title": "Project: uefi-uefimcp-bct",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "Project: uefi-uefimcp-bct › Ferramentas MCP"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-context/projects/uefi-uefimcp-biotec.md",
+            "title": "Project: uefi-uefimcp-biotec",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "Project: uefi-uefimcp-biotec › Ferramentas MCP"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-context/projects/uefi-uefimcp-introducao-a-biotec.md",
+            "title": "Project: uefi-uefimcp-introducao-a-biotec",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "Project: uefi-uefimcp-introducao-a-biotec › Ferramentas MCP"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-context/projects/uefi-uefimcp-introducao-as-engenharias.md",
+            "title": "Project: uefi-uefimcp-introducao-as-engenharias",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "Project: uefi-uefimcp-introducao-as-engenharias › Ferramentas MCP"
+          }
+        ],
+        "latencyMs": 33907,
+        "usage": {
+          "inputTokens": 2434,
+          "outputTokens": 1366
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1354,8 +3103,97 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "As fontes não trazem o comando de instalação exato. Elas descrevem dois servidores de disciplina que têm `symbolic_math: true` nas *feature flags*:\n\n- **Bases Matemáticas (BIS0003-15)** — repositório privado `uefi-uefimcp-bm` [1][3]\n- **Funções de Várias Variáveis (FVV)** — repositório privado `uefi-uefimcp-fvv` [6][7]\n\nO que as fontes mostram sobre execução:\n- Transporte **stdio**, iniciado por **caminho absoluto para `run.py`** [4][5]\n- SDK compatível: **`mcp >=1.27,<2`** com suporte a PDF via *extra* `pdf` [4][5]\n- Configuração em `config/subject.json` e exemplo de cliente em `config/mcp.example.json` [4][5]\n- Teste reproduzível: `scripts/check_mcp.py` [4][5]\n\nComo os repositórios são **privados** (GitHub da organização `uefiabece`), o passo típico seria:\n1. Clonar o repositório da disciplina desejada (ex.: `git clone https://github.com/uefiabece/uefi-uefimcp-bm` ou `.../uefi-uefimcp-fvv`).\n2. Instalar dependências (provavelmente `pip install -e .[pdf]` ou similar, dado o *extra* `pdf`).\n3. Executar o servidor apontando para o `run.py` (ex.: `python /caminho/absoluto/para/run.py`).\n\nPara o comando exato de instalação/execução, consulte o `README` ou a documentação interna de cada repositório, ou contate o responsável pelo provisionamento do conteúdo acadêmico.",
+        "pass": false,
+        "factsOk": false,
+        "factsFound": [
+          false
+        ],
+        "citations": {
+          "valid": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": true,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-context/projects/uefi-uefimcp-bm.md",
+            "title": "uefi-uefimcp-bm — MCP de Bases Matemáticas",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-bm — MCP de Bases Matemáticas › Propósito"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-context/projects/uefi-uefimcp-bm.md",
+            "title": "uefi-uefimcp-bm — MCP de Bases Matemáticas",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-bm — MCP de Bases Matemáticas › Arquivos relevantes"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-context/projects/uefi-uefimcp-bm.md",
+            "title": "uefi-uefimcp-bm — MCP de Bases Matemáticas",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-bm — MCP de Bases Matemáticas › Feature flags (config/subject.json)"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-context/projects/uefi-uefimcp-introducao-a-neuro.md",
+            "title": "Uefi-uefimcp-introducao-a-neuro",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-introducao-a-neuro"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-context/projects/uefi-uefimcp-femec.md",
+            "title": "Uefi-uefimcp-femec",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-femec"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-context/projects/uefi-uefimcp-fvv.md",
+            "title": "uefi-uefimcp-fvv — MCP de Funções de Várias Variáveis",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-fvv — MCP de Funções de Várias Variáveis › Feature flags (config/subject.json)"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-context/projects/uefi-uefimcp-fvv.md",
+            "title": "uefi-uefimcp-fvv — MCP de Funções de Várias Variáveis",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-fvv — MCP de Funções de Várias Variáveis › Propósito"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-context/projects/uefi-uefimcp-neuro.md",
+            "title": "Uefi-uefimcp-neuro",
+            "subject": "Ecossistema UÉFIabecê",
+            "pages": null,
+            "heading": "uefi-uefimcp-neuro"
+          }
+        ],
+        "latencyMs": 21296,
+        "usage": {
+          "inputTokens": 2373,
+          "outputTokens": 731
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1407,8 +3245,91 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "As fontes apresentadas não contêm o valor da bolsa permanência para 2026.\n\nOs documentos disponíveis (PPCs de 2023 e 2018) mencionam a existência de “Programas de Apoio Auxílio Alimentação, Permanência, Moradia e Creche” [2] e “auxílio acessibilidade em que alunos são contemplados com bolsa, conforme a publicação de editais do programa” [4], mas não informam valores monetários nem projeções para anos futuros.\n\nPara obter o valor oficial e atualizado da bolsa permanência, consulte os **editais vigentes da Pró‑Reitoria de Assuntos Comunitários e Políticas Afirmativas (ProAP)** ou a **Seção de Bolsas e Auxílios da ProAP**, que publicam as normas, prazos e valores a cada seleção.",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [],
+        "citations": {
+          "valid": [
+            2,
+            4
+          ],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": true,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 33",
+            "heading": "8.4.2 Acessibilidade"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 34",
+            "heading": "8.4.2 Acessibilidade"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Dados do Curso"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 31",
+            "heading": "8.3.5. Acessibilidade"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 36–37",
+            "heading": "9. Ações Acadêmicas Complementares À Formação"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 37",
+            "heading": "9. Ações Acadêmicas Complementares À Formação"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 37",
+            "heading": "9. Ações Acadêmicas Complementares À Formação"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 7",
+            "heading": "3 Apresentação"
+          }
+        ],
+        "latencyMs": 16346,
+        "usage": {
+          "inputTokens": 3407,
+          "outputTokens": 785
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1460,8 +3381,88 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "As fontes fornecidas não contêm informações sobre o cardápio do restaurante universitário. Elas tratam apenas de documentos acadêmicos (PPCs, planejamento de oferta de disciplinas, bibliotecas e atividades de extensão) dos cursos de Biotecnologia e Ciência e Tecnologia.\n\nPara obter o cardápio da semana, você precisaria consultar:\n- O site ou aplicativo oficial da UFABC (geralmente na área de assistência estudantil ou restaurante universitário)\n- As redes sociais ou comunicados da Pró-Reitoria de Assuntos Estudantis (PROAE) ou setor equivalente\n- Painéis de avisos nos próprios restaurantes universitários",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [],
+        "citations": {
+          "valid": [],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": true,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 43",
+            "heading": "10. Atividades De Extensão E Cultura"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 59",
+            "heading": "15.2. Sistema de Bibliotecas – SisBi"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 50–51",
+            "heading": "14.1 Instalações, laboratórios e biblioteca"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 31–32",
+            "heading": "Opção Limitada Opção Limitada"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 45–46",
+            "heading": "Livres"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 4",
+            "heading": "Sa Sbc Sa Sbc Sa Sbc Sa Sbc Sa Sbc Sa Sbc"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 29",
+            "heading": "8.3. Estratégias Pedagógicas"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 43–44",
+            "heading": "14.1.1. Bibliotecas"
+          }
+        ],
+        "latencyMs": 11848,
+        "usage": {
+          "inputTokens": 3711,
+          "outputTokens": 504
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1514,8 +3515,97 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "As fontes apresentadas não contêm a nota de corte do SiSU para o BC&T em 2026. Os documentos disponíveis tratam do planejamento de oferta de disciplinas para 2026 [1][2][3] e dos Projetos Pedagógicos do Curso (PPC 2015 e 2023) [4][5][6][7][8], que descrevem as modalidades de ingresso (SiSU, Olimpíadas, transferências) e a distribuição de vagas, mas não trazem notas de corte históricas ou previstas.\n\nPara obter a nota de corte do SiSU 2026, consulte:\n- O **resultado oficial do SiSU 2026** (divulgado pelo MEC/INEP);\n- Os **relatórios de ocupação de vagas ou estatísticas de ingresso** da PROGRAD/UF ABC;\n- Editais de matrícula ou chamadas da UFABC referentes ao SiSU 2026.",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [],
+        "citations": {
+          "valid": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "invalid": []
+        },
+        "citedExpected": false,
+        "abstained": true,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 3",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1–2",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 7",
+            "heading": "3 Apresentação"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 11",
+            "heading": "Forma De Acesso Ao Curso"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 16",
+            "heading": "6.1 Forma de acesso ao curso"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 27",
+            "heading": "8.3 Componentes curriculares para a integralização do curso"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 19",
+            "heading": "Regime De Ensino"
+          }
+        ],
+        "latencyMs": 14868,
+        "usage": {
+          "inputTokens": 3792,
+          "outputTokens": 616
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1573,8 +3663,92 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Segundo o PPC 2023, no edital de ingresso nos Bacharelados Interdisciplinares de 2020 (edital nº 131/2019), o BC&T ofereceu **431 vagas** em São Bernardo do Campo, sendo 214 no turno matutino e 217 no noturno [3].",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true
+        ],
+        "citations": {
+          "valid": [
+            3
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 12",
+            "heading": "4.1 Justificativa de oferta de curso"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 11",
+            "heading": "Forma De Acesso Ao Curso"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 16",
+            "heading": "6.1 Forma de acesso ao curso"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 7",
+            "heading": "3 Apresentação"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 5",
+            "heading": "Apresentação"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-bct/content/syllabus/curriculo_bct.md",
+            "title": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": null,
+            "heading": "Currículo do Bacharelado em Ciência e Tecnologia (BC&T) — UFABC › Dados do Curso"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-bct/content/bibliography/planejamento_oferta_disciplinas_2026.pdf",
+            "title": "Planejamento oferta disciplinas 2026",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 1",
+            "heading": "Obrigatórias Do Bc&t - 2026"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 18–19",
+            "heading": "Regime De Ensino"
+          }
+        ],
+        "latencyMs": 9848,
+        "usage": {
+          "inputTokens": 3372,
+          "outputTokens": 540
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     },
     {
@@ -1636,8 +3810,93 @@
         }
       },
       "answer": {
-        "error": "Sem credencial da Anthropic: defina ANTHROPIC_API_KEY no .env, ou use LLM_PROVIDER=ollama para gerar localmente.",
-        "pass": false
+        "text": "Segundo o PPC 2023 do Bacharelado em Ciência e Tecnologia, a UFABC foi **uma das pioneiras na introdução da reserva de vagas de 50% para alunos de escolas públicas** [1][2].\n\nO documento não detalha a distribuição percentual entre os subgrupos (renda, PPI, PcD) dentro dessas vagas reservadas, mas confirma que metade das vagas é destinada a candidatos oriundos de escolas públicas.",
+        "pass": true,
+        "factsOk": true,
+        "factsFound": [
+          true
+        ],
+        "citations": {
+          "valid": [
+            1,
+            2
+          ],
+          "invalid": []
+        },
+        "citedExpected": true,
+        "abstained": false,
+        "sources": [
+          {
+            "n": 1,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 7–8",
+            "heading": "3 Apresentação"
+          },
+          {
+            "n": 2,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 35–36",
+            "heading": "8.5 Apresentação gráfica de um perfil de formação"
+          },
+          {
+            "n": 3,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 16",
+            "heading": "6.1 Forma de acesso ao curso"
+          },
+          {
+            "n": 4,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 11",
+            "heading": "Forma De Acesso Ao Curso"
+          },
+          {
+            "n": 5,
+            "docId": "uefi-uefimcp-bct/content/bibliography/ppc_2015.pdf",
+            "title": "PPC 2015",
+            "subject": "Bacharelado em Ciência e Tecnologia",
+            "pages": "p. 4–5",
+            "heading": "Apresentação"
+          },
+          {
+            "n": 6,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 6",
+            "heading": "3.1. Apresentação da Instituição"
+          },
+          {
+            "n": 7,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2023.pdf",
+            "title": "PPC 2023",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 6",
+            "heading": "3.1. Apresentação da Instituição"
+          },
+          {
+            "n": 8,
+            "docId": "uefi-uefimcp-biotec/content/bibliography/ppc_2018.pdf",
+            "title": "PPC 2018",
+            "subject": "Bacharelado em Biotecnologia",
+            "pages": "p. 43",
+            "heading": "14. Infraestrutura"
+          }
+        ],
+        "latencyMs": 7888,
+        "usage": {
+          "inputTokens": 3195,
+          "outputTokens": 508
+        },
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
       }
     }
   ]

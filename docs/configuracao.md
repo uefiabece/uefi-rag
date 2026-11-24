@@ -20,7 +20,8 @@ Três fontes de configuração, todas na raiz do repositório:
 | `LLM_PROVIDER` | `anthropic` | `anthropic`, `openai` ou `ollama`. |
 | `LLM_MODEL` | `claude-opus-5` / `gpt-5` / `qwen2.5:7b` | Modelo de geração, conforme o provedor. |
 | `ANTHROPIC_API_KEY` | — | Necessária com `LLM_PROVIDER=anthropic`. |
-| `OPENAI_API_KEY` | — | Necessária com `EMBED_PROVIDER=openai` ou `LLM_PROVIDER=openai`. |
+| `OPENAI_API_KEY` | — | Necessária com `EMBED_PROVIDER=openai` ou `LLM_PROVIDER=openai` contra a API da OpenAI. Servidores compatíveis sem chave dispensam. |
+| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | Endereço de qualquer API compatível com a da OpenAI: `https://openrouter.ai/api/v1`, `https://api.groq.com/openai/v1`, `http://127.0.0.1:11434/v1` (Ollama). Vale para geração e embeddings. |
 | `PORT` | `8787` | Porta da API (sempre em `127.0.0.1`). Também é a porta que o servidor MCP procura. |
 | `PUBLIC_ONLY` | — | `1` força todas as rotas a responder só com documentos públicos. |
 | `LEXICAL_WEIGHT` | `0.5` | Peso da busca léxica no RRF. Ver [avaliacao.md](avaliacao.md). |

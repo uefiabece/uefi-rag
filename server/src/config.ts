@@ -44,6 +44,8 @@ export const settings = {
     model: process.env.LLM_MODEL,
   },
   ollamaUrl: process.env.OLLAMA_URL ?? "http://127.0.0.1:11434",
+  // Qualquer servidor compatível com a API da OpenAI (OpenRouter, Groq, o /v1 do Ollama…) serve aqui.
+  openaiUrl: (process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1").replace(/\/+$/, ""),
   port: Number(process.env.PORT ?? 8787),
   publicOnly: process.env.PUBLIC_ONLY === "1",
 };

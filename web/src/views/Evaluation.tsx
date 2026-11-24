@@ -22,6 +22,7 @@ export function Evaluation() {
     );
 
   const a = report.answers;
+  const outOfScope = report.items.filter((it) => !it.fontes.length && it.answer && !it.answer.error).length;
   return (
     <>
       <p className="small italic muted" style={{ marginTop: 0, textAlign: "center" }}>
@@ -37,14 +38,22 @@ export function Evaluation() {
         </p>
       )}
       {a && a.n > 0 && (
-        <div className="stats">
-          <div className="stat"><div className="v">{pct(a.pass)}</div><div className="l">respostas aprovadas</div></div>
-          <div className="stat"><div className="v">{pct(a.factsOk)}</div><div className="l">com todos os fatos do gabarito</div></div>
-          <div className="stat"><div className="v">{pct(a.citedExpected)}</div><div className="l">citam o documento esperado</div></div>
-          <div className="stat"><div className="v">{pct(a.abstainedCorrectly)}</div><div className="l">recusam o que não está no acervo</div></div>
-          <div className="stat"><div className="v">{a.invalidCitations}</div><div className="l">citações sem fonte</div></div>
-          <div className="stat"><div className="v">{(a.medianLatencyMs / 1000).toFixed(1).replace(".", ",")} s</div><div className="l">latência mediana</div></div>
-        </div>
+        <>
+          <div className="stats">
+            <div className="stat"><div className="v">{pct(a.pass)}</div><div className="l">respostas aprovadas ({a.n})</div></div>
+            <div className="stat"><div className="v">{a.invalidCitations}</div><div className="l">citações inválidas</div></div>
+            <div className="stat"><div className="v">{pct(a.abstainedCorrectly)}</div><div className="l">abstenções corretas fora do acervo ({outOfScope})</div></div>
+            <div className="stat"><div className="v">{pct(a.factsOk)}</div><div className="l">com todos os fatos do gabarito</div></div>
+            <div className="stat"><div className="v">{pct(a.citedExpected)}</div><div className="l">citam o documento esperado</div></div>
+            <div className="stat"><div className="v">{(a.medianLatencyMs / 1000).toFixed(1).replace(".", ",")} s</div><div className="l">latência mediana</div></div>
+          </div>
+          {!!a.errors && (
+            <p className="notice small" style={{ marginBottom: 28 }}>
+              {a.errors} de {report.items.length} chamadas ao gerador falharam e ficaram fora das taxas acima
+              {report.items.find((it) => it.answer?.error)?.answer?.error ? ` (${report.items.find((it) => it.answer?.error)!.answer!.error!.slice(0, 160)})` : ""}.
+            </p>
+          )}
+        </>
       )}
 
       <h3 className="section-title"><span>Recuperação</span><span>o documento esperado está entre os k trechos devolvidos?</span></h3>

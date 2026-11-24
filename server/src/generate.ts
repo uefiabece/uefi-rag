@@ -61,21 +61,30 @@ class AnthropicGenerator implements Generator {
 
 class OpenAIGenerator implements Generator {
   readonly provider = "openai";
-  constructor(readonly model: string, private apiKey: string) {}
+  constructor(readonly model: string, private apiKey: string | undefined, private url: string) {}
 
   async stream(system: string, messages: ChatTurn[], onText: (delta: string) => void, signal?: AbortSignal) {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      signal,
-      headers: { "content-type": "application/json", authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model: this.model,
-        stream: true,
-        stream_options: { include_usage: true },
-        messages: [{ role: "system", content: system }, ...messages],
-      }),
-    });
-    if (!res.ok || !res.body) throw new Error(`OpenAI ${res.status}: ${await res.text()}`);
+    const request = () =>
+      fetch(`${this.url}/chat/completions`, {
+        method: "POST",
+        signal,
+        headers: { "content-type": "application/json", ...(this.apiKey && { authorization: `Bearer ${this.apiKey}` }) },
+        body: JSON.stringify({
+          model: this.model,
+          stream: true,
+          stream_options: { include_usage: true },
+          messages: [{ role: "system", content: system }, ...messages],
+        }),
+      });
+    // Modelos gratuitos (OpenRouter, Groq) devolvem 429 por minuto ou por pool compartilhado; esperar resolve.
+    let res = await request();
+    for (let attempt = 1; attempt <= 5 && (res.status === 429 || res.status === 503); attempt++) {
+      const after = Number(res.headers.get("retry-after"));
+      await res.body?.cancel();
+      await sleep(after > 0 ? after * 1000 : 5000 * 2 ** attempt, signal);
+      res = await request();
+    }
+    if (!res.ok || !res.body) throw new Error(`${this.url}/chat/completions ${res.status}: ${await res.text()}`);
     let text = "";
     let stopReason: string | null = null;
     let usage: GenerationResult["usage"] = null;
@@ -139,6 +148,13 @@ class OllamaGenerator implements Generator {
   }
 }
 
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => (clearTimeout(t), reject(signal.reason)), { once: true });
+  });
+}
+
 async function* lines(body: ReadableStream<Uint8Array>): AsyncGenerator<string> {
   const decoder = new TextDecoder();
   let buffer = "";
@@ -164,8 +180,9 @@ export function getGenerator(override?: { provider?: string; model?: string }): 
   switch (provider) {
     case "openai": {
       const key = process.env.OPENAI_API_KEY;
-      if (!key) throw new Error("LLM_PROVIDER=openai exige OPENAI_API_KEY.");
-      return new OpenAIGenerator(model ?? "gpt-5", key);
+      // Servidores locais compatíveis (Ollama, LM Studio) não pedem chave; a API da OpenAI sim.
+      if (!key && !process.env.OPENAI_BASE_URL) throw new Error("LLM_PROVIDER=openai exige OPENAI_API_KEY (ou OPENAI_BASE_URL para um servidor compatível sem chave).");
+      return new OpenAIGenerator(model ?? "gpt-5", key, settings.openaiUrl);
     }
     case "ollama":
       return new OllamaGenerator(model ?? "qwen2.5:7b", settings.ollamaUrl);

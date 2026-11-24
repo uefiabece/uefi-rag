@@ -120,6 +120,7 @@ export interface EvalReport {
   retrieval: Record<string, RetrievalMetrics>;
   answers: null | {
     n: number;
+    errors?: number;
     pass: number | null;
     factsOk: number | null;
     citedExpected: number | null;

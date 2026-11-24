@@ -30,19 +30,19 @@ class OllamaEmbedder implements Embedder {
 }
 
 class OpenAIEmbedder implements Embedder {
-  constructor(readonly model: string, private apiKey: string) {}
+  constructor(readonly model: string, private apiKey: string | undefined, private url: string) {}
 
   async dim() {
     return (await this.embed(["dimensão"]))[0]!.length;
   }
 
   async embed(texts: string[]): Promise<number[][]> {
-    const res = await fetch("https://api.openai.com/v1/embeddings", {
+    const res = await fetch(`${this.url}/embeddings`, {
       method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${this.apiKey}` },
+      headers: { "content-type": "application/json", ...(this.apiKey && { authorization: `Bearer ${this.apiKey}` }) },
       body: JSON.stringify({ model: this.model, input: texts }),
     });
-    if (!res.ok) throw new Error(`OpenAI /v1/embeddings ${res.status}: ${await res.text()}`);
+    if (!res.ok) throw new Error(`${this.url}/embeddings ${res.status}: ${await res.text()}`);
     const json = (await res.json()) as { data: { index: number; embedding: number[] }[] };
     return json.data.sort((a, b) => a.index - b.index).map((d) => d.embedding);
   }
@@ -51,8 +51,8 @@ class OpenAIEmbedder implements Embedder {
 export function getEmbedder(): Embedder {
   if (settings.embed.provider === "openai") {
     const key = process.env.OPENAI_API_KEY;
-    if (!key) throw new Error("EMBED_PROVIDER=openai exige OPENAI_API_KEY.");
-    return new OpenAIEmbedder(process.env.EMBED_MODEL ?? "text-embedding-3-small", key);
+    if (!key && !process.env.OPENAI_BASE_URL) throw new Error("EMBED_PROVIDER=openai exige OPENAI_API_KEY (ou OPENAI_BASE_URL para um servidor compatível sem chave).");
+    return new OpenAIEmbedder(process.env.EMBED_MODEL ?? "text-embedding-3-small", key, settings.openaiUrl);
   }
   return new OllamaEmbedder(settings.embed.model, settings.ollamaUrl);
 }

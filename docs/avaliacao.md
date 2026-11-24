@@ -56,6 +56,24 @@ A vetorial pura ainda vence por pouco nesta amostra, o equivalente a uma ou duas
 
 Próximo passo natural: mais perguntas com códigos e nomes próprios no conjunto público, para que essa escolha deixe de depender de dois itens.
 
+### Primeira rodada de respostas
+
+Com um modelo gratuito via OpenRouter (`nvidia/nemotron-3-ultra-550b-a55b:free`, `OPENAI_BASE_URL=https://openrouter.ai/api/v1`), as 26 perguntas públicas:
+
+| Métrica | Resultado |
+|---|---|
+| Respostas aprovadas | 81% (21 de 26) |
+| Com todos os fatos do gabarito | 91% (21 de 23) |
+| Citam o documento esperado | 74% |
+| Abstenção correta fora do acervo | 100% (3 de 3) |
+| Abstenções indevidas | 2 |
+| Citações inválidas | 0 |
+| Latência mediana | 14,7 s |
+
+Das cinco reprovações, três (pub-03, pub-16, pub-20) têm os fatos certos mas nenhuma citação `[n]` válida: o modelo às vezes escreve `[Fonte 1 (p. 11)]`, formato que `parseCitations` não aceita, e a regra reprova. As outras duas são abstenções indevidas: pub-18 (prazo até a recuperação) e pub-21, cujo documento esperado nem chega à busca híbrida (só a vetorial o encontra). O prompt não foi ajustado para este modelo; a nota mede a aderência dele ao contrato de citações tal como está.
+
+O plano gratuito do OpenRouter limita a 20 requisições por minuto e o pool de cada modelo `:free` é compartilhado. `google/gemma-4-31b-it:free` devolveu 429 em todas as chamadas no mesmo dia. Por isso o gerador compatível com a OpenAI repete a chamada com espera crescente ao receber 429/503.
+
 ## Rodar
 
 ```bash
@@ -63,4 +81,5 @@ npm run eval                         # público, recuperação + respostas
 npm run eval -- --no-answers         # só recuperação (sem chave de API)
 npm run eval -- --set privado        # local; o resultado fica fora do git
 LLM_PROVIDER=ollama npm run eval     # respostas com um modelo local
+LLM_PROVIDER=openai OPENAI_BASE_URL=https://openrouter.ai/api/v1 LLM_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free npm run eval   # modelo gratuito, chave do OpenRouter em OPENAI_API_KEY
 ```
